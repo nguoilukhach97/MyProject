@@ -1,0 +1,32 @@
+﻿using MyProject.Application.ModelRequestService.ModelCommon;
+using MyProject.Application.ModelRequestService.PublicRequest;
+using MyProject.Application.ModelRequestService.ServiceRequest;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MyProject.Application.Service
+{
+    public interface IProductService
+    {
+        #region Manage
+        Task<int> CreateProduct(ProductCreateRequest request);
+        Task<int> CreateProductDetail(ProductDetailCreateRequest request);
+        Task<int> UpdateProduct(ProductUpdateRequest request);
+        Task<int> UpdateProductDetail(ProductDetailUpdateRequest request);
+        Task<int> DeleteProduct(int id);
+        Task<int> DeleteProductDetail(int idDetail);
+
+        Task UpdateViewCount(int productId);
+
+        #endregion
+
+        #region Public 
+
+        Task<PagedViewResult<ProductViewModel>> GetAllPaging(ProductPaingParam request);
+        Task<PagedViewResult<ProductViewModel>> GetAllByCategory(int CategoryId,int pageIndex,int pageSize);
+        #endregion
+
+    }
+}
