@@ -11,7 +11,12 @@ namespace MyProject.Data.Entities
         public int BrandId { get; set; }
         
         public string Description { get; set; }
+        public string Details { get; set; }
 
+        public DateTime DateCreated { get; set; }
+        public int UserCreated { get; set; }
+        public DateTime? DateModified { get; set; }
+        public int? UserModified { get; set; }
         public int ViewCount { get; set; }
 
         public bool Status { get; set; }

@@ -6,9 +6,12 @@ namespace MyProject.Application.ModelRequestService.PublicRequest
 {
     public class ProductViewModel
     {
-        
+
+        public int Id { get; set; }
         public string Name { get; set; }
         public int BrandId { get; set; }
+        public int CategoryId { get; set; }
+        public string BrandName { get; set; }
         public decimal PriceStart { get; set; }
         public decimal PriceEnd { get; set; }
         public string Description { get; set; }

@@ -8,7 +8,7 @@ namespace MyProject.Data.Entities
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public string Details { get; set; }
+        
         public decimal Price { get; set; }
         public decimal PromotionPrice { get; set; }
         public int Quantity { get; set; }

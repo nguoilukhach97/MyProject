@@ -1,4 +1,5 @@
-﻿using MyProject.Application.ModelRequestService.ModelCommon;
+﻿using Microsoft.AspNetCore.Http;
+using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.PublicRequest;
 using MyProject.Application.ModelRequestService.ServiceRequest;
 using System;
@@ -20,6 +21,15 @@ namespace MyProject.Application.Service
 
         Task UpdateViewCount(int productId);
 
+
+        // thêm ảnh
+
+        Task<int> AddImage(int productId, ProductImageCreateRequest request);
+        Task<int> RemoveImage(int productId);
+        Task<int> UpdateImage(int imageId, ProductImageUpdateRequest request);
+
+        Task<ProductImageViewModel> GetImageById(int id);
+        Task<List<ProductImageViewModel>> GetListImages(int productId);
         #endregion
 
         #region Public 

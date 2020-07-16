@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,5 +17,7 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest
         public int ViewCount { get; set; }
 
         public bool Status { get; set; }
+
+        public IFormFile ImageProduct { get; set; }
     }
 }

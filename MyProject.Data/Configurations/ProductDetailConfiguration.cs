@@ -14,13 +14,18 @@ namespace MyProject.Data.Configurations
             builder.ToTable("ProductDetails");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn();
-            builder.Property(x => x.Details).HasColumnType("ntext");
+            
             builder.Property(x => x.Price).HasDefaultValueSql("0");
             builder.Property(x => x.PromotionPrice).HasDefaultValueSql("0");
             builder.Property(x => x.Quantity).HasDefaultValueSql("0");
             builder.Property(x => x.Warranty).HasDefaultValueSql("0");
             builder.Property(x => x.Size).HasDefaultValueSql("0");
             builder.Property(x => x.Status).HasDefaultValueSql("1");
+
+            builder.Property(x => x.DateCreated).HasColumnType("datetime");
+            builder.Property(x => x.DateModified).HasColumnType("datetime");
+            builder.Property(x => x.DateModified).IsRequired(false);
+            builder.Property(x => x.UserModified).IsRequired(false);
 
             builder.HasOne(p => p.Product).WithMany(p => p.ProductDetails).HasForeignKey(p => p.ProductId);
         }

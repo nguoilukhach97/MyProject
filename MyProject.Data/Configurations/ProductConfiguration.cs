@@ -18,7 +18,11 @@ namespace MyProject.Data.Configurations
             builder.Property(p => p.Name).HasMaxLength(250);
             builder.Property(p => p.Description).HasColumnType("ntext");
             builder.Property(p => p.ViewCount).HasDefaultValueSql("0");
-
+            builder.Property(x => x.Details).HasColumnType("ntext");
+            builder.Property(x => x.DateCreated).HasColumnType("datetime");
+            builder.Property(x => x.DateModified).HasColumnType("datetime");
+            builder.Property(x => x.DateModified).IsRequired(false);
+            builder.Property(x => x.UserModified).IsRequired(false);
             builder.HasOne(p => p.Brand).WithMany(p => p.Products).HasForeignKey(p => p.BrandId);
             
 
