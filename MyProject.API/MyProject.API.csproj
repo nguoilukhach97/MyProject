@@ -4,5 +4,22 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyProject.Application\MyProject.Application.csproj" />
+    <ProjectReference Include="..\MyProject.Common\MyProject.Common.csproj" />
+    <ProjectReference Include="..\MyProject.Data\MyProject.Data.csproj" />
+    <ProjectReference Include="..\MyProject.Utilities\MyProject.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\js\" />
+    <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
 
 </Project>
