@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyProject.Application.ModelRequestService.ModelCommon;
+using MyProject.Application.ModelRequestService.ServiceRequest;
 using MyProject.Application.Service;
+using MyProject.Data.Entities;
 
 namespace MyProject.API.Controllers
 {
@@ -33,6 +35,30 @@ namespace MyProject.API.Controllers
             };
             var data = await _service.GetAllPaging(param);
             return Ok(data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostAsync([FromBody]ProductCreateRequest request)
+        {
+            var result = await _service.CreateProduct(request);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> PutAsync([FromBody]ProductUpdateRequest request)
+        {
+            var result = await _service.UpdateProduct(request);
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var result = await _service.DeleteProduct(id);
+
+            return Ok();
         }
     }
 }
