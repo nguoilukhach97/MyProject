@@ -2,6 +2,7 @@
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.PublicRequest;
 using MyProject.Application.ModelRequestService.ServiceRequest;
+using MyProject.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,7 +36,7 @@ namespace MyProject.Application.Service
         #region Public 
 
         Task<PagedViewResult<ProductViewModel>> GetAllPaging(ProductPaingParam request);
-        Task<PagedViewResult<ProductViewModel>> GetAllByCategory(int CategoryId,int pageIndex,int pageSize);
+        Task<PagedViewResult<Product>> GetAllByCategory();
         #endregion
 
     }

@@ -280,9 +280,16 @@ namespace MyProject.Application.Service
 
         #region Public 
 
-        public async Task<PagedViewResult<ProductViewModel>> GetAllByCategory(int CategoryId, int pageIndex, int pageSize)
+        public async Task<PagedViewResult<Product>> GetAllByCategory()
         {
-            throw new NotImplementedException();
+            var product = _context.Products.OrderBy(p => p.Name);
+            var data = new PagedViewResult<Product>()
+            {
+                Items = await product.ToListAsync(),
+                TotalRecord = await product.CountAsync()
+            };
+
+            return data;
         }
 
         public async Task<PagedViewResult<ProductViewModel>> GetAllPaging(ProductPaingParam request)
@@ -313,11 +320,11 @@ namespace MyProject.Application.Service
                            });
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                product.Where(p => p.Name.Contains(request.Keyword) || p.Description.Contains(request.Keyword));
+                product = product.Where(p => p.Name.Contains(request.Keyword) || p.Description.Contains(request.Keyword));
             }
             if(request.CategoryId.Count()>0)
             {
-                product.Where(p => request.CategoryId.Contains(p.CategoryId));
+                product = product.Where(p => request.CategoryId.Contains(p.CategoryId));
                 
             }
             int totalRow = await product.CountAsync();
