@@ -1,14 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyProject.Data.Configurations;
 using MyProject.Data.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace MyProject.Data.EF
 {
-    public class MyProjectDbContext : DbContext
+    public class MyProjectDbContext : IdentityDbContext<AppUser,AppRole,Guid>
     {
         public MyProjectDbContext(DbContextOptions options) : base(options)
         {
@@ -25,7 +27,13 @@ namespace MyProject.Data.EF
             builder.ApplyConfiguration(new ProductImageConfiguration());
             builder.ApplyConfiguration(new ProductInOrderConfiguration());
             builder.ApplyConfiguration(new ProductInCategoryConfiguration());
+            builder.ApplyConfiguration(new AppRoleConfiguration());
+            builder.ApplyConfiguration(new AppUserConfiguration());
 
+            builder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims");
+            builder.Entity<IdentityUserRole<Guid>>().ToTable("AppUserRoles").HasKey(p=> new { p.UserId,p.RoleId});
+            builder.Entity<IdentityUserLogin<Guid>>().ToTable("AppUserLogins").HasKey(p=>p.UserId);
+            builder.Entity<IdentityUserToken<Guid>>().ToTable("AppUserTokens").HasKey(p=>p.UserId);
             //base.OnModelCreating(builder);
         }
 

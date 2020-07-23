@@ -16,5 +16,7 @@ namespace MyProject.Data.Entities
         public int Status { get; set; }
 
         public virtual ICollection<ProductInOrder> ProductInOrders { get; set; }
+
+        public AppUser AppUser { get; set; }
     }
 }
