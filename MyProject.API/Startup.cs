@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +15,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.Service;
+using MyProject.Application.System.User;
 using MyProject.Data.EF;
+using MyProject.Data.Entities;
 
 namespace MyProject.API
 {
@@ -37,7 +40,9 @@ namespace MyProject.API
             // declare DI
             services.AddTransient<IStorageService, FileStorageService>();
             services.AddTransient<IProductService, ProductService>();
-            
+            services.AddTransient<SignInManager<AppUser>,SignInManager<AppUser>>();
+            services.AddTransient<RoleManager<AppRole>,RoleManager<AppRole>>();
+            services.AddTransient<IUserService, UserService>();
 
             services.AddControllers();
 
