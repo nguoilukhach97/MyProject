@@ -36,7 +36,9 @@ namespace MyProject.API
             services.AddDbContext<MyProjectDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("myProjectDb")));
 
-
+            services.AddIdentity<AppUser, AppRole>()
+                .AddEntityFrameworkStores<MyProjectDbContext>()
+                .AddDefaultTokenProviders();
             // declare DI
             services.AddTransient<IStorageService, FileStorageService>();
             services.AddTransient<IProductService, ProductService>();
@@ -49,7 +51,33 @@ namespace MyProject.API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger MyProject", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n
+                    Enter 'Bearer' [space] and then your token in the text input below.
+                    \r\n\r\nExemple : 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference()
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
 
+                        },
+                        new List<string>()
+                    }
+                });
             });
         }
 
