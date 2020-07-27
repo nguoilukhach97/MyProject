@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyProject.Application.ModelRequestService.ModelCommon;
@@ -13,6 +14,7 @@ namespace MyProject.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
@@ -33,7 +35,7 @@ namespace MyProject.API.Controllers
                 pageSize = 10
 
             };
-            var data = await _service.GetAllPaging(param);
+            var data = await _service.GetAllByCategory();
             return Ok(data);
         }
 
