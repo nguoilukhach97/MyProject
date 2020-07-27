@@ -39,7 +39,7 @@ namespace MyProject.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<MyProjectDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("myProjectDb")));
+                options.UseSqlServer(Configuration.GetConnectionString("myProjectDb")));
 
             services.AddIdentity<AppUser, AppRole>()
                 .AddEntityFrameworkStores<MyProjectDbContext>()
