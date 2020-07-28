@@ -14,7 +14,7 @@ namespace MyProject.API.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -59,11 +59,15 @@ namespace MyProject.API.Controllers
             return Ok();
         }
         
-        [HttpGet("getstring")]
-        public async Task<IActionResult> GetStringAsync()
+
+        [HttpGet("paging")]
+        public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)
         {
-            //ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
-            return Ok("OK ..");
+            var data = await _userService.GetUserPaging(request);
+
+            return Ok(data);
+
         }
+        
     }
 }

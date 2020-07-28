@@ -1,4 +1,5 @@
-﻿using MyProject.Application.ModelRequestService.ServiceRequest.User;
+﻿using MyProject.Application.ModelRequestService.ModelCommon;
+using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,5 +11,7 @@ namespace MyProject.Application.System.User
     {
         Task<string> Authenticate(LoginRequest request);
         Task<bool> Register(RegisterRequest request);
+
+        Task<PagedViewResult<UserViewModel>> GetUserPaging(GetUserPagingRequest request);
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
@@ -27,9 +28,19 @@ namespace MyProject.Controllers
             _userApi = userApi;
             _configuration = configuration;
         }
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(string keyword, int pageIndex=1, int pageSize=2)
         {
-            return View();
+            var sessions = HttpContext.Session.GetString("Token");
+            var request = new GetUserPagingRequest()
+            {
+                BearerToken = sessions,
+                Keyword = keyword,
+                pageIndex = pageIndex,
+                pageSize= pageSize
+            };
+            var data = await _userApi.GetUserPaging(request);
+            return View(data);
         }
 
         [HttpGet]
@@ -53,6 +64,7 @@ namespace MyProject.Controllers
                 ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
                 IsPersistent = true
             };
+            HttpContext.Session.SetString("Token",token); 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 userPrincipal,
@@ -64,12 +76,27 @@ namespace MyProject.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Remove("Token");
             return RedirectToAction("Login","User");
         }
-        [HttpPost]
+
+        [HttpGet]
         public IActionResult Register()
         {
+
             return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterRequest request)
+        {
+            if (!ModelState.IsValid)
+                return View();
+            var result = await _userApi.RegisterUser(request);
+            if (result)
+            {
+                return RedirectToAction("Index","User");
+            }
+            return View(request);
         }
 
 

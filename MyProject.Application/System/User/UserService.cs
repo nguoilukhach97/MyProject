@@ -1,12 +1,15 @@
 ﻿ using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Data.Entities;
 using MyProject.Utilities.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -63,6 +66,8 @@ namespace MyProject.Application.System.User
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        
+
         public async Task<bool> Register(RegisterRequest request)
         {
             var user = new AppUser()
@@ -83,6 +88,36 @@ namespace MyProject.Application.System.User
             return false;
         }
 
-        
+
+        public async Task<PagedViewResult<UserViewModel>> GetUserPaging(GetUserPagingRequest request)
+        {
+            var query = _userManager.Users;
+            if (!string.IsNullOrEmpty(request.Keyword))
+            {
+                query = query.Where(x => x.UserName.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
+            }
+
+            int totalRow = await query.CountAsync();
+
+            var data = await query.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize)
+                .Select(x => new UserViewModel()
+                {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    PhoneNumber =x.PhoneNumber,
+                    Email = x.Email,
+                    UserName = x.UserName
+                }).ToListAsync();
+
+            var pagedResult = new PagedViewResult<UserViewModel>()
+            {
+                TotalRecord = totalRow,
+                Items = data
+            };
+
+            return pagedResult;
+        }
+
     }
 }

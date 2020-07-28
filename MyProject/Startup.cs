@@ -28,6 +28,8 @@ namespace MyProject
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
+            
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.LoginPath = "/User/Login";
@@ -36,6 +38,11 @@ namespace MyProject
 
             services.AddControllersWithViews()
                 .AddFluentValidation(v => v.RegisterValidatorsFromAssemblyContaining<LoginRequestValidator>());
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
 
             services.AddTransient<IUserApi, UserApi>();
 
@@ -71,6 +78,7 @@ namespace MyProject
 
             app.UseAuthorization();
 
+            app.UseSession();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
