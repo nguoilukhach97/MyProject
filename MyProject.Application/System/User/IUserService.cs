@@ -9,9 +9,9 @@ namespace MyProject.Application.System.User
 {
     public interface IUserService
     {
-        Task<string> Authenticate(LoginRequest request);
-        Task<bool> Register(RegisterRequest request);
+        Task<ApiResult<string>> Authenticate(LoginRequest request);
+        Task<ApiResult<bool>> Register(RegisterRequest request);
 
-        Task<PagedViewResult<UserViewModel>> GetUserPaging(GetUserPagingRequest request);
+        Task<ApiResult<PagedViewResult<UserViewModel>>> GetUserPaging(GetUserPagingRequest request);
     }
 }
