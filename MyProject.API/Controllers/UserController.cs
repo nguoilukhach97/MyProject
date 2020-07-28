@@ -14,7 +14,7 @@ namespace MyProject.API.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -30,7 +30,7 @@ namespace MyProject.API.Controllers
 
         [HttpPost("Authenticate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromForm] LoginRequest requets)
+        public async Task<IActionResult> Authenticate([FromBody] LoginRequest requets)
         {
             if (!ModelState.IsValid)
             {
@@ -41,11 +41,11 @@ namespace MyProject.API.Controllers
             {
                 return BadRequest("Username or Password is incorrect");
             }
-            return Ok( new { token= resultToken});
+            return Ok(resultToken);
         }
         [HttpPost("Register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromForm] RegisterRequest requets)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest requets)
         {
             if (!ModelState.IsValid)
             {
