@@ -41,12 +41,21 @@ namespace MyProject.API
             services.AddDbContext<MyProjectDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("myProjectDb")));
 
-            services.AddIdentity<AppUser, AppRole>()
+            services.AddIdentity<AppUser, AppRole>(
+                    opt =>
+                    {
+                        opt.Password.RequireDigit = false;
+                        opt.Password.RequireLowercase = false;
+                        opt.Password.RequireUppercase = false;
+                        opt.Password.RequireNonAlphanumeric = false;
+                    }
+                )
                 .AddEntityFrameworkStores<MyProjectDbContext>()
                 .AddDefaultTokenProviders();
             // declare DI
             services.AddTransient<IStorageService, FileStorageService>();
             services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<UserManager<AppUser>, UserManager<AppUser>>();
             services.AddTransient<SignInManager<AppUser>,SignInManager<AppUser>>();
             services.AddTransient<RoleManager<AppRole>,RoleManager<AppRole>>();
             services.AddTransient<IUserService, UserService>();

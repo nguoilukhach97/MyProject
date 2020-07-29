@@ -1,0 +1,129 @@
+﻿@model MyProject.Application.ModelRequestService.ServiceRequest.User.RegisterRequest;
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Page Title - SB Admin</title>
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-primary">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-7">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Đăng ký tài khoản</h3></div>
+                                <div class="card-body">
+                                    <form asp-controller="User" asp-action="Register" method="post">
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    
+                                                    <label class="small mb-1" for="FirstName">First Name</label>
+                                                    <input class="form-control py-4" asp-for="FirtsName" type="text" placeholder="Nhập first name" />
+                                                    <span asp-validation-for="FirtsName" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    
+                                                    <label class="small mb-1" for="LastName">Last Name</label>
+                                                    <input class="form-control py-4" asp-for="LastName" type="text" placeholder="Enter last name" />
+                                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    
+                                                    <label class="small mb-1" for="Dob">Ngày sinh</label>
+                                                    <input class="form-control py-4" asp-for="Dob" type="date" placeholder="Nhập ngày sinh" />
+                                                    <span asp-validation-for="Dob" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    
+                                                    <label class="small mb-1" for="PhoneNumber">Số điện thoại</label>
+                                                    <input class="form-control py-4" asp-for="PhoneNumber" type="text" pattern="[0-9]{10,11}" placeholder="Enter phone number" />
+                                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            
+                                            <label class="small mb-1" for="Email">Email</label>
+                                            <input class="form-control py-4" asp-for="Email" type="email" aria-describedby="emailHelp" placeholder="Enter email address" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            
+                                            <label class="small mb-1" for="UserName">Tên người dùng</label>
+                                            <input class="form-control py-4" asp-for="UserName" type="text" placeholder="Enter Username" />
+                                            <span asp-validation-for="UserName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    
+                                                    <label class="small mb-1" for="password">Mật khẩu</label>
+                                                    <input class="form-control py-4" name="password" type="password" placeholder="Nhập mật khẩu" />
+                                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    
+                                                    <label class="small mb-1" for="confirmpassword">Nhập lại mật khẩu</label>
+                                                    <input class="form-control py-4" name="confirmpassword" type="password" placeholder="Nhập lại mật khẩu" />
+                                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-4 mb-0">
+                                            <button type="submit" class="btn btn-primary btn-block">Tạo tài khoản</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <div class="small"><a href="/User/Login">Đã có tài khoản ? Đăng nhập ngay !</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <div id="layoutAuthentication_footer">
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="/js/scripts.js"></script>
+</body>
+</html>

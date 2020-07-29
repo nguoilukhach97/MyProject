@@ -17,7 +17,8 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest.User
             RuleFor(x => x.LastName).NotEmpty().WithMessage("Last Name không được để trống !")
                 .MaximumLength(200).WithMessage("Tên quá dài > 200 ký tự !");
 
-            RuleFor(x => x.Dob).GreaterThan(DateTime.Now.AddYears(-120)).WithMessage("Tuổi của bạn quá cao >120 tuổi !");
+            RuleFor(x => x.Dob).NotEmpty().WithMessage("Ngày sinh đang trống !")
+                .GreaterThan(DateTime.Now.AddYears(-120)).WithMessage("Tuổi của bạn quá cao >120 tuổi !");
             RuleFor(x => x.Email).NotEmpty().WithMessage("Email không được để trống !")
                 .Matches(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$").WithMessage("Email sai định dạng !");
 
@@ -34,6 +35,7 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest.User
                 {
                     context.AddFailure("Password không trùng !");
                 }
+                
             });
 
         }
