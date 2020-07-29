@@ -28,37 +28,51 @@ namespace MyProject.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost("Authenticate")]
+        [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromBody] LoginRequest requets)
+        public async Task<IActionResult> Login([FromBody] LoginRequest requets)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(requets);
             }
-            var resultToken = await _userService.Authenticate(requets);
-            if (string.IsNullOrEmpty(resultToken))
+            var resultToken = await _userService.AuthenticateAsync(requets);
+            if (!resultToken.Successed)
             {
-                return BadRequest("Username or Password is incorrect");
+                return BadRequest(requets);
             }
-            return Ok(resultToken);
+            return Ok(resultToken.AccessToken);
         }
+        
         [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequest requets)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var result = await _userService.Register(requets);
-            if (!result)
-            {
-                return BadRequest("Register khong duoc");
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+            //var result = await _userService.Register(requets);
+            //if (!result)
+            //{
+            //    return BadRequest("Register khong duoc");
+            //}
             return Ok();
         }
-        
+        [HttpPut]
+        public async Task<IActionResult> ChangePassword(Guid id, string currentPass, string newPass)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var result = await _userService.ChangePassword(id,currentPass,newPass);
+            if (result.Successed)
+            {
+                return Ok(result.Errors);
+            }
+            return BadRequest(result.Errors);
+        }
 
         [HttpGet("paging")]
         public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)

@@ -1,4 +1,5 @@
-﻿using MyProject.Application.ModelRequestService.ModelCommon;
+﻿using MyProject.Application.Auth.Dtos;
+using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,13 @@ namespace MyProject.Application.System.User
 {
     public interface IUserService
     {
-        Task<ApiResult<string>> Authenticate(LoginRequest request);
-        Task<ApiResult<bool>> Register(RegisterRequest request);
+        Task<AuthenticateResponse> AuthenticateAsync(LoginRequest request);
+        
+        Task<ResponseBase> Register(RegisterRequest request);
 
+        Task<ResponseBase> ChangePassword(Guid id, string currentPass, string newPass);
+
+        Task<UserViewModel> GetUserById(Guid id);
         Task<ApiResult<PagedViewResult<UserViewModel>>> GetUserPaging(GetUserPagingRequest request);
     }
 }
