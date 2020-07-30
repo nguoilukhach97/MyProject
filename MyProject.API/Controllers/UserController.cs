@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyProject.Application.Auth.Dtos;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Application.System.User;
 using MyProject.Common;
@@ -79,6 +80,17 @@ namespace MyProject.API.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _userService.UpdateAsync(id, request);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/role")]
+        public async Task<IActionResult> UpdateRoleAsync(Guid id, [FromBody] ListRoles request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _userService.UpdateRoles(id, request);
             return Ok(result);
         }
         [HttpDelete("{id}")]

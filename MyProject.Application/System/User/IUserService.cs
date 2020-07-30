@@ -18,6 +18,7 @@ namespace MyProject.Application.System.User
         Task<ResponseBase> ChangePassword(Guid id, string currentPass, string newPass);
 
         Task<ResponseBase> UpdateAsync(Guid id, UpdateUserRequest request);
+        Task<ResponseBase> UpdateRoles(Guid id,ListRoles roles);
         Task<ResponseBase> DeleteAsync(Guid id);
         Task<UserResponse<UserViewModel>> GetUserById(Guid id);
         Task<Pagination<UserViewModel>> GetUserPaging(SearchingBase request);
