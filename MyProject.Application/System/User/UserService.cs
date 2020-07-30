@@ -39,43 +39,7 @@ namespace MyProject.Application.System.User
             _jwtToken = jwtToken;
             _config = config; 
         }
-        
-        
-
-
-        public async Task<ApiResult<PagedViewResult<UserViewModel>>> GetUserPaging(GetUserPagingRequest request)
-        {
-            //var query = _userManager.Users;
-            //if (!string.IsNullOrEmpty(request.Keyword))
-            //{
-            //    query = query.Where(x => x.UserName.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
-            //}
-
-            //int totalRow = await query.CountAsync();
-
-            //var data = await query.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize)
-            //    .Select(x => new UserViewModel()
-            //    {
-            //        Id = x.Id,
-            //        FirstName = x.FirstName,
-            //        LastName = x.LastName,
-            //        PhoneNumber =x.PhoneNumber,
-            //        Email = x.Email,
-            //        UserName = x.UserName
-            //    }).ToListAsync();
-
-            //var pagedResult = new PagedViewResult<UserViewModel>()
-            //{
-            //    TotalRecord = totalRow,
-            //    Items = data
-            //};
-
-            //return pagedResult;
-
-            throw new Exception();
-        }
-
-
+                        
         #region
 
         public async Task<AuthenticateResponse> AuthenticateAsync(LoginRequest request)
@@ -126,6 +90,15 @@ namespace MyProject.Application.System.User
             {
                 return failResponse;
             }
+            if (await _userManager.FindByEmailAsync(request.Email) != null)
+            {
+                var failResponseEmail = new AuthenticateResponse()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "register_failed", Description = CommonMessage.EmailAlreadyExists }
+                };
+                return failResponse;
+            }
             var user = new AppUser()
             {
                 Dob = request.Dob,
@@ -135,7 +108,6 @@ namespace MyProject.Application.System.User
                 UserName = request.UserName,
                 PhoneNumber = request.PhoneNumber
             };
-
             var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {
@@ -180,10 +152,142 @@ namespace MyProject.Application.System.User
             }
         }
 
-        public async Task<UserViewModel> GetUserById(Guid id)
+        public async Task<ResponseBase> UpdateAsync(Guid id, UpdateUserRequest request )
         {
-            var user = new UserViewModel();
-            var ruser = await _userManager.FindByIdAsync(id.ToString());
+            var failResponse = new AuthenticateResponse()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "change_pass_failure", Description = CommonMessage.UpdateFailed }
+            };
+            if (await _userManager.Users.AnyAsync(x=>x.Email == request.Email && x.Id != id))
+            {
+                var failEmail = new ResponseBase()
+                {
+                    Successed = false,
+                    Errors = new Error() { Code = "update_failed", Description = CommonMessage.EmailAlreadyExists}
+
+                };
+                return failEmail;
+            }
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return failResponse;
+            }
+
+            user.FirstName = request.FirtsName;
+            user.LastName = request.LastName;
+            user.Dob = request.Dob;
+            user.Email = request.Email;
+            user.PhoneNumber = request.PhoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                var success = new ResponseBase()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "update_success", Description = CommonMessage.UpdateSuccessed }
+
+                };
+                return success;
+            }
+            return failResponse;
+        }
+
+        public async Task<ResponseBase> DeleteAsync(Guid id)
+        {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "delete_failed", Description = CommonMessage.DeleteFailed}
+            };
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                response.Errors.Description = CommonMessage.CannotFind;
+                return response;
+            }
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                var responseSuccessed = new ResponseBase()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "delete_success", Description = CommonMessage.DeleteSuccessed }
+                };
+                return responseSuccessed;
+            }
+            return response;
+        }
+
+        public async Task<UserResponse<UserViewModel>> GetUserById(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return new UserResponse<UserViewModel>()
+                {
+                    Successed = false,
+                    Errors = new Error() { Code = "not_find_user", Description = CommonMessage.FindUserByIdFailed }
+                };
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            var result = new UserViewModel()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                UserName = user.UserName,
+                Roles = roles
+            };
+            var successed = new UserResponse<UserViewModel>()
+            {
+                Object = result,
+                Successed = true,
+                Errors = new Error() { Code = "find_user_successed", Description = CommonMessage.FindUserByIdSuccessed }
+            };
+            
+            return successed;
+        }
+
+
+        public async Task<Pagination<UserViewModel>> GetUserPaging(SearchingBase request)
+        {
+            var query = _userManager.Users;
+            if (!string.IsNullOrEmpty(request.Keyword))
+            {
+                query = query.Where(x => x.UserName.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword)
+                || x.Email.Contains(request.Keyword));
+            }
+
+            int totalRow = await query.CountAsync();
+
+            var data = await query.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize)
+                .Select(x => new UserViewModel()
+                {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    PhoneNumber = x.PhoneNumber,
+                    Email = x.Email,
+                    UserName = x.UserName
+                }).ToListAsync();
+
+            var pagedResult = new Pagination<UserViewModel>()
+            {
+                CurrentPage = request.PageIndex,
+                PageSize = request.PageSize,
+                TotalPages = totalRow % request.PageSize == 0 ? totalRow / request.PageSize : totalRow / request.PageSize + 1,
+                TotalRows = totalRow,
+                Data = data
+            };
+
+            return pagedResult;
+
+           
         }
         #endregion
     }

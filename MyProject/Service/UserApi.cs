@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
+using MyProject.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,9 +18,11 @@ namespace MyProject.Service
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
-        public UserApi(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserApi(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
         }
         public async Task<string> Authenticate(LoginRequest request)
@@ -29,24 +33,26 @@ namespace MyProject.Service
 
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration["BaseAddress"]);
-            var response =await client.PostAsync("/Api/User/Authenticate",httpContent);
+            var response =await client.PostAsync("/Api/User",httpContent);
             var token = await response.Content.ReadAsStringAsync();
-
             return token;   
 
         }
 
-        public async Task<PagedViewResult<UserViewModel>> GetUserPaging(GetUserPagingRequest request)
+        public async Task<Pagination<UserViewModel>> GetUserPaging(SearchingBase request)
         {
-            
             var client = _httpClientFactory.CreateClient();
+            //var session = _httpContextAccessor.HttpContext.Session.GetString("Token");
+            var session = _httpContextAccessor.HttpContext.Request.Cookies["token"];
             client.BaseAddress = new Uri(_configuration["BaseAddress"]);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",request.BearerToken);
-            var response = await client.GetAsync($"/api/user/paging?pageIndex={request.pageIndex}" +
-                $"&pageSize={request.pageSize}&keyword={request.Keyword}");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",session);
+
+            var response = await client.GetAsync($"/api/user/paging?pageIndex={request.PageIndex}" +
+                $"&pageSize={request.PageSize}&keyword={request.Keyword}");
 
             var data = await response.Content.ReadAsStringAsync();
-            var users = JsonConvert.DeserializeObject<PagedViewResult<UserViewModel>>(data);
+            var users = JsonConvert.DeserializeObject<Pagination<UserViewModel>>(data);
 
             return users;
         }

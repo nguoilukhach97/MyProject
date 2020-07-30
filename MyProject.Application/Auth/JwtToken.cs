@@ -70,8 +70,10 @@ namespace MyProject.Application.Auth
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = _config["Tokens:Issuer"],
+                Audience = _config["Tokens:Issuer"],
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddHours(1),
                 SigningCredentials = creds
             };
             var token = _jwtSecurityTokenHandler.CreateJwtSecurityToken(tokenDescriptor);

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Application.System.User;
+using MyProject.Common;
 
 namespace MyProject.API.Controllers
 {
@@ -48,16 +49,16 @@ namespace MyProject.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequest requets)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
-            //var result = await _userService.Register(requets);
-            //if (!result)
-            //{
-            //    return BadRequest("Register khong duoc");
-            //}
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _userService.Register(requets);
+            if (result.Successed)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
         }
         [HttpPut]
         public async Task<IActionResult> ChangePassword(Guid id, string currentPass, string newPass)
@@ -66,16 +67,35 @@ namespace MyProject.API.Controllers
             {
                 return BadRequest();
             }
-            var result = await _userService.ChangePassword(id,currentPass,newPass);
-            if (result.Successed)
+            var result = await _userService.ChangePassword(id, currentPass, newPass);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(Guid id,[FromBody] UpdateUserRequest request)
+        {
+            if (!ModelState.IsValid)
             {
-                return Ok(result.Errors);
+                return BadRequest(ModelState);
             }
-            return BadRequest(result.Errors);
+            var result = await _userService.UpdateAsync(id, request);
+            return Ok(result);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var result = await _userService.DeleteAsync(id);
+            return Ok(result);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            var result = await _userService.GetUserById(id);
+            return Ok(result);
         }
 
         [HttpGet("paging")]
-        public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)
+        public async Task<IActionResult> GetAllPaging([FromQuery] SearchingBase request)
         {
             var data = await _userService.GetUserPaging(request);
 
