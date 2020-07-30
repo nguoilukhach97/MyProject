@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyProject.Application.ModelRequestService.ModelCommon;
-using MyProject.Application.ModelRequestService.ServiceRequest;
+using MyProject.Application.ModelRequestService.ServiceRequest.Product;
 using MyProject.Application.Service;
+using MyProject.Common;
 using MyProject.Data.Entities;
 
 namespace MyProject.API.Controllers
@@ -26,41 +27,31 @@ namespace MyProject.API.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync([FromQuery] SearchingBase request)
         {
-            var param = new ProductPaingParam()
-            {
-                CategoryId = new List<int> { 1 },
-                pageIndex = 1,
-                pageSize = 10
-
-            };
-            var data = await _service.GetAllByCategory();
-            return Ok(data);
+            var result = await _service.GetAllByCategory(request);
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody]ProductCreateRequest request)
+        public async Task<IActionResult> PostAsync([FromForm] ProductCreateRequest request)
         {
             var result = await _service.CreateProduct(request);
-
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync([FromBody]ProductUpdateRequest request)
+        public async Task<IActionResult> PutAsync([FromForm] ProductUpdateRequest request)
         {
             var result = await _service.UpdateProduct(request);
-
-            return Ok();
+            return Ok(result);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _service.DeleteProduct(id);
-
-            return Ok();
+            return Ok(result);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace MyProject.Application.Service
                 BrandId = request.BrandId,
                 Description = request.Description,
                 Details = request.Details,
-                DateCreated = request.DateCreated,
+                DateCreated = DateTime.Now.Date,
                 UserCreated = request.UserCreated,
                 ViewCount =0,
                 Status = request.Status
@@ -203,7 +203,7 @@ namespace MyProject.Application.Service
                 product.BrandId = request.BrandId;
                 product.Description = request.Description;
                 product.Details = request.Details;
-                product.DateModified = request.DateModified;
+                product.DateModified = DateTime.Now.Date;
                 product.UserModified = request.UserModified;
                 product.Status = request.Status;
 

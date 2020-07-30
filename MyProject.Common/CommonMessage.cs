@@ -19,10 +19,10 @@ namespace MyProject.Common
         public const string DeleteFailed = "Xóa thất bại !";
         public const string DeleteSuccessed = "Xóa thành công !";
         public const string CannotFind = "Không tìm thấy đối tượng !";
-        public const string CreateproductSuccessed = "Tạo sản phẩm thất bại !";
+        public const string CreateproductSuccessed = "Tạo sản phẩm thành công !";
         public const string CreateproductFailed = "Tạo sản phẩm thành công !";
         public const string DeleteproductFailed = "Sửa sản phẩm thất bại !";
-        public const string DeleteproductSuccessed = "Sửa sản phẩm thành công !";
+        public const string DeleteproductSuccessed = "Xóa phẩm thành công !";
         public const string UpdateProductSuccessed = "Cập nhật phẩm thành công !";
         public const string UpdateProductFailed = "Cập nhật phẩm thất bại !";
     }

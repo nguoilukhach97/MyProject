@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MyProject.Application.ModelRequestService.ModelCommon
 {
-    public class ProductPaingParam : PagingRequestBase
+    public class ProductPaingParam 
     {
         public string Keyword { get; set; }
 

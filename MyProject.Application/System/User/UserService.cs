@@ -28,7 +28,6 @@ namespace MyProject.Application.System.User
         private readonly RoleManager<AppRole> _roleManager;
         private readonly IConfiguration _config;
         private readonly IJwtToken _jwtToken;
-
         public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
             RoleManager<AppRole> roleManager,
             IConfiguration config,IJwtToken jwtToken)

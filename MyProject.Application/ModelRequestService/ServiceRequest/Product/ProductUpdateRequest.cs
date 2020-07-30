@@ -13,7 +13,7 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest.Product
 
         public string Description { get; set; }
         public string Details { get; set; }
-        public DateTime? DateModified { get; set; }
+        
         public int? UserModified { get; set; }
         
 
