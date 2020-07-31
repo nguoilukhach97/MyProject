@@ -27,5 +27,13 @@ namespace MyProject.Controllers
             var result = await _productApi.GetAllPaging(search);
             return View(result);
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetProduct(int id)
+        {
+            var result = await _productApi.GetProduct(id);
+            return Json(result);
+        }
+        
     }
 }

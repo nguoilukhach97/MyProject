@@ -42,7 +42,7 @@ namespace MyProject.Data.Migrations
                 type: "datetime2",
                 nullable: false,
                 oldClrType: typeof(DateTime),
-                oldType: "datetime");
+                oldType: "datetime2");
         }
     }
 }

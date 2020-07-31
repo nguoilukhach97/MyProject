@@ -40,8 +40,10 @@ namespace MyProject.Service
 
 
         Task<Pagination<Product>> GetAllPaging(SearchingBase request);
+        Task<Product> GetProduct(int id);
 
         Task<Pagination<ProductDetail>> GetAllSize(int id, SearchingBase request);
+        
         #endregion
 
     }

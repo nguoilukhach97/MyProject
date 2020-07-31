@@ -110,5 +110,22 @@ namespace MyProject.Service
         {
             throw new NotImplementedException();
         }
+
+        public async Task<Product> GetProduct(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            //var session = _httpContextAccessor.HttpContext.Session.GetString("Token");
+            var session = _httpContextAccessor.HttpContext.Request.Cookies["token"];
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
+
+            var response = await client.GetAsync($"/api/product/{id}");
+
+            var data = await response.Content.ReadAsStringAsync();
+            var product = JsonConvert.DeserializeObject<Product>(data);
+
+            return product;
+        }
     }
 }

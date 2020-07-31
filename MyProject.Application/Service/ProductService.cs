@@ -425,6 +425,14 @@ namespace MyProject.Application.Service
             return result;
         }
 
+        public async Task<Product> GetProduct(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            return product;
+        }
+
+
+
         //public async Task<PagedViewResult<ProductViewModel>> GetAllPaging(ProductPaingParam request)
         //{
         //    var product =(from a in _context.Products
@@ -458,7 +466,7 @@ namespace MyProject.Application.Service
         //    if(request.CategoryId.Count()>0)
         //    {
         //        product = product.Where(p => request.CategoryId.Contains(p.CategoryId));
-                
+
         //    }
         //    int totalRow = await product.CountAsync();
         //    var data = await product.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize).ToListAsync();

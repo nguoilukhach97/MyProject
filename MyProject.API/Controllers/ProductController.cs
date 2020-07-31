@@ -33,6 +33,12 @@ namespace MyProject.API.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
+        public async Task<IActionResult> GetProduct(int id)
+        {
+            var result = await _service.GetProduct(id);
+            return Ok(result);
+        }
+        [HttpGet("{id}/detail")]
         public async Task<IActionResult> GetDetailAsync(int id,[FromQuery] SearchingBase request)
         {
             var result = await _service.GetAllSize(id, request);
@@ -70,5 +76,6 @@ namespace MyProject.API.Controllers
             var result = await _service.DeleteProduct(id);
             return Ok(result);
         }
+        
     }
 }

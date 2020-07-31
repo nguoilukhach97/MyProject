@@ -5,11 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @*@if (ViewBag.SuccessMsg != null)
-{
-    <div id="msgAlert" class="alert alert-success" style="position:absolute;" role="alert">
-        @ViewBag.SuccessMsg
-    </div>
-}*@
+    {
+        <div id="msgAlert" class="alert alert-success" style="position:absolute;" role="alert">
+            @ViewBag.SuccessMsg
+        </div>
+    }*@
 <div class="container-fluid">
     <h1 class="mt-4">Danh sách người dùng</h1>
     <ol class="breadcrumb mb-4">
@@ -21,6 +21,11 @@
         <div class="card-header">
             <i class="fas fa-table mr-1"></i>
             Người dùng
+            <button class="btn btn-success float-right" id="create-product">
+                <i class="fas fa-plus-circle"></i>
+                Thêm mới
+            </button>
+
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -48,8 +53,8 @@
                                 <td>@item.Details</td>
                                 <td>@item.DateCreated</td>
                                 <td style="display:flex; margin:5px;">
-                                    <button type="button" data-id="@item.Id" class="btn btn-sm btn-success update-user" style="margin-right:5px;">Sửa</button>
-                                    <button type="button" data-id="@item.Id" class="btn btn-sm btn-danger delete-user">Xóa</button>
+                                    <button type="button" data-id="@item.Id" class="btn btn-sm btn-success update-product" style="margin-right:5px;">Sửa</button>
+                                    <button type="button" data-id="@item.Id" class="btn btn-sm btn-danger delete-product">Xóa</button>
                                 </td>
                             </tr>
                         }
@@ -65,12 +70,12 @@
 
 @*modal update*@
 
-<div class="modal fade" id="modal-update" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="modal-create" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Cập nhật người dùng</h4>
+                <h4 class="modal-title" id="myModalLabel">Tạo mới sản phẩm</h4>
                 <button type="button" class="close" data-dismiss="modal">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -88,50 +93,59 @@
                                         <input type="hidden" name="id" id="id" />
 
                                         <label class="col-form-label col-md-3 col-sm-3  label-align">
-                                            First name :<span class="required">*</span>
+                                            Tên sản phẩm :<span class="required">*</span>
 
                                         </label>
                                         <div class="col-md-8 col-sm-8">
 
-                                            <input type="text" class="form-control" maxlength="100" name="FirtsName" id="first-name"
+                                            <input type="text" class="form-control" maxlength="100" name="Name" id="name"
                                                    required="required" />
                                         </div>
                                     </div>
                                     <div class="field item form-group">
                                         <label class="col-form-label col-md-3 col-sm-3  label-align">
-                                            Last name :<span class="required">*</span>
+                                            Thương hiệu :<span class="required">*</span>
                                         </label>
                                         <div class="col-md-8 col-sm-8">
-
-                                            <input type="text" class="form-control" name="LastName" id="last-name"
-                                                   required="required" />
+                                            <select name="BrandId" id="brand-id" class="form-control">
+                                                <option>Adidas</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="field item form-group">
                                         <label class="col-form-label col-md-3 col-sm-3  label-align">
-                                            Date of birth :<span class="required">*</span>
+                                            Mô tả sản phẩm :<span class="required">*</span>
                                         </label>
                                         <div class="col-md-8 col-sm-8">
+                                            <textarea name="Description" id="description" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-5 col-sm-5  label-align">
+                                            Giới thiệu sản phẩm :<span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+                                            <textarea name="Details" id="details"class="form-control"></textarea>
+                                        </div>
+                                    </div>
 
-                                            <input type="date" class="form-control" max="1/1/2020" min="1/1/1900" name="Dob" id="dob" required />
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
+                                            Hình ảnh : <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+                                            <input type="file" class="form-control-file" name="ImageProduct" id="image" />
                                         </div>
                                     </div>
                                     <div class="field item form-group">
                                         <label class="col-form-label col-md-3 col-sm-3  label-align">
-                                            Email :<span class="required">*</span>
+                                            Tình trạng : <span class="required">*</span>
                                         </label>
                                         <div class="col-md-8 col-sm-8">
-
-                                            <input type="email" class="form-control" name="Email" id="email" required />
-                                        </div>
-                                    </div>
-
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
-                                            Phone number : <span class="required">*</span>
-                                        </label>
-                                        <div class="col-md-8 col-sm-8">
-                                            <input class="form-control number" type="text" pattern="[0-9]{9,12}" name="PhoneNumber" id="phone-number" required='required'>
+                                            <select name="Status" id="status" class="form-control">
+                                                <option value="true">Kích hoạt</option>
+                                                <option value="false">Không kích hoạt</option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -183,5 +197,5 @@
 @section js
 {
 
-    
+    <script src="~/js/product.js"></script>
 }

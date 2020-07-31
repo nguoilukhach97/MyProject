@@ -11,16 +11,16 @@ namespace MyProject.Data.Migrations
                 name: "Details",
                 table: "ProductDetails");
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "DateCreated",
-                table: "Products",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+            //migrationBuilder.AddColumn<DateTime>(
+            //    name: "DateCreated",
+            //    table: "Products",
+            //    nullable: false,
+            //    defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "DateModified",
-                table: "Products",
-                nullable: true);
+            //migrationBuilder.AddColumn<DateTime>(
+            //    name: "DateModified",
+            //    table: "Products",
+            //    nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "Details",
@@ -28,16 +28,16 @@ namespace MyProject.Data.Migrations
                 type: "ntext",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "UserCreated",
-                table: "Products",
-                nullable: false,
-                defaultValue: 0);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "UserCreated",
+            //    table: "Products",
+            //    nullable: false,
+            //    defaultValue: 0);
 
-            migrationBuilder.AddColumn<int>(
-                name: "UserModified",
-                table: "Products",
-                nullable: true);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "UserModified",
+            //    table: "Products",
+            //    nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

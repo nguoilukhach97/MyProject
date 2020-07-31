@@ -46,6 +46,7 @@ namespace MyProject
 
             services.AddTransient<IUserApi, UserApi>();
             services.AddTransient<IProductApi, ProductApi>();
+            services.AddTransient<IBrandApi, BrandApi>();
 
             IMvcBuilder builder = services.AddRazorPages();
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
