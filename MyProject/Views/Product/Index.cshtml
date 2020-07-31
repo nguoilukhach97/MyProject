@@ -1,15 +1,15 @@
-﻿@using  MyProject.Common;
-@model Pagination<MyProject.Application.ModelRequestService.ServiceRequest.User.UserViewModel>
+﻿@using MyProject.Common;
+@model Pagination<MyProject.Data.Entities.Product>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý sản phẩm";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@if (ViewBag.SuccessMsg != null)
+@*@if (ViewBag.SuccessMsg != null)
 {
     <div id="msgAlert" class="alert alert-success" style="position:absolute;" role="alert">
         @ViewBag.SuccessMsg
     </div>
-}
+}*@
 <div class="container-fluid">
     <h1 class="mt-4">Danh sách người dùng</h1>
     <ol class="breadcrumb mb-4">
@@ -42,11 +42,11 @@
                         {
                             <tr>
 
-                                <td>@item.FirstName</td>
-                                <td>@item.LastName</td>
-                                <td>@item.PhoneNumber</td>
-                                <td>@item.Email</td>
-                                <td>@item.UserName</td>
+                                <td>@item.Name</td>
+                                <td>@item.ProductDetails</td>
+                                <td>@item.Description</td>
+                                <td>@item.Details</td>
+                                <td>@item.DateCreated</td>
                                 <td style="display:flex; margin:5px;">
                                     <button type="button" data-id="@item.Id" class="btn btn-sm btn-success update-user" style="margin-right:5px;">Sửa</button>
                                     <button type="button" data-id="@item.Id" class="btn btn-sm btn-danger delete-user">Xóa</button>
@@ -183,5 +183,5 @@
 @section js
 {
 
-    <script src="~/js/user.js"></script>
+    
 }

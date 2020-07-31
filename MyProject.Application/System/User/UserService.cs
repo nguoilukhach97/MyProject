@@ -272,6 +272,7 @@ namespace MyProject.Application.System.User
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
+                Dob = user.Dob,
                 PhoneNumber = user.PhoneNumber,
                 UserName = user.UserName,
                 Roles = roles
@@ -305,6 +306,7 @@ namespace MyProject.Application.System.User
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhoneNumber = x.PhoneNumber,
+                    Dob = x.Dob,
                     Email = x.Email,
                     UserName = x.UserName
                 }).ToListAsync();

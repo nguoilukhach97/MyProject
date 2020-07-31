@@ -141,17 +141,25 @@ namespace MyProject.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("Index");
+                TempData["result"] = "Thêm mới người dùng thất bại !";
+                return RedirectToAction("Index", "User");
             }
             var result = await _userApi.UpdateUser(id, request);
             if (result.Successed)
             {
-                TempData["result"] = "Thêm mới người dùng thành công";
+                TempData["result"] = result.Errors.Description;
                 return RedirectToAction("Index", "User");
             }
             TempData["result"] = result.Errors.Description;
             return RedirectToAction("Index", "User");
 
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetUserById(Guid id)
+        {
+            var user = await _userApi.GetUserAsync(id);
+            return Json(user);
         }
 
         private ClaimsPrincipal ValidateToken(string JwtToken)

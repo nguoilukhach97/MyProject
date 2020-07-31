@@ -56,7 +56,22 @@ namespace MyProject.Service
 
             return users;
         }
+        public async Task<UserViewModel> GetUserAsync(Guid id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            //var session = _httpContextAccessor.HttpContext.Session.GetString("Token");
+            var session = _httpContextAccessor.HttpContext.Request.Cookies["token"];
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
 
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
+
+            var response = await client.GetAsync($"/api/user/{id}");
+
+            var data = await response.Content.ReadAsStringAsync();
+            var users = JsonConvert.DeserializeObject<UserViewModel>(data);
+
+            return users;
+        }
         public async Task<ResponseBase> RegisterUser(RegisterRequest request)
         {
             var client = _httpClientFactory.CreateClient();

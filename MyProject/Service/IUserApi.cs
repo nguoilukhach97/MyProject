@@ -18,6 +18,7 @@ namespace MyProject.Service
         Task<ResponseBase> RegisterUser(RegisterRequest request);
         Task<ResponseBase> Delete(Guid id);
         Task<ResponseBase> UpdateUser(Guid id, UpdateUserRequest request);
+        Task<UserViewModel> GetUserAsync(Guid id);
 
     }
 }

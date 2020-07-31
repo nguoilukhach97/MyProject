@@ -29,7 +29,7 @@ namespace MyProject.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync([FromQuery] SearchingBase request)
         {
-            var result = await _service.GetAllByCategory(request);
+            var result = await _service.GetAllPaging(request);
             return Ok(result);
         }
         [HttpGet("{id}")]

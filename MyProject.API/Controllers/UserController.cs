@@ -96,7 +96,7 @@ namespace MyProject.API.Controllers
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var result = await _userService.GetUserById(id);
-            return Ok(result);
+            return Ok(result.Object);
         }
 
         [HttpGet("paging")]

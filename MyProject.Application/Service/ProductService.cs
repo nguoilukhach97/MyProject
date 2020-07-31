@@ -381,7 +381,7 @@ namespace MyProject.Application.Service
 
         #region Public 
 
-        public async Task<Pagination<Product>> GetAllByCategory(SearchingBase request)
+        public async Task<Pagination<Product>> GetAllPaging(SearchingBase request)
         {
             var product = _context.Products.OrderBy(p => p.Name);
             if (!string.IsNullOrEmpty(request.Keyword))
