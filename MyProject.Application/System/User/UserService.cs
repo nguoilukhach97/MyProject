@@ -194,6 +194,40 @@ namespace MyProject.Application.System.User
             return failResponse;
         }
 
+        public async Task<ResponseBase> UpdateRoles(Guid id, ListRoles role)
+        {
+            var response = new ResponseBase()
+            {
+                Successed=false,
+                Errors = new Error() { Code ="update_role_failed",Description = CommonMessage.UpdateRoleFailed}
+            };
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                response.Errors.Description = CommonMessage.CannotFind;
+                return response;
+            }
+            var removeRoles = role.Roles.Where(x => x.IsSelected == false).Select(x => x.Name).ToList();
+            await _userManager.RemoveFromRolesAsync(user,removeRoles);
+            var addRoles = role.Roles.Where(x => x.IsSelected).Select(x => x.Name).ToList();
+            foreach (var item in addRoles)
+            {
+                if (await _userManager.IsInRoleAsync(user,item) == false)
+                {
+                    await _userManager.AddToRoleAsync(user, item);
+                }
+                
+            }
+            var responseSucced = new ResponseBase()
+            {
+                Successed = true,
+                Errors = new Error() { Code = "update_role_success", Description = CommonMessage.UpdateRoleSuccessed }
+            };
+
+            return responseSucced;
+
+        }
+
         public async Task<ResponseBase> DeleteAsync(Guid id)
         {
             var response = new ResponseBase()

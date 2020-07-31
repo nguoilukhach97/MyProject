@@ -24,6 +24,8 @@ namespace MyProject.Common
         public const string DeleteproductFailed = "Sửa sản phẩm thất bại !";
         public const string DeleteproductSuccessed = "Xóa phẩm thành công !";
         public const string UpdateProductSuccessed = "Cập nhật phẩm thành công !";
-        public const string UpdateProductFailed = "Cập nhật phẩm thất bại !";
+        public const string UpdateProductFailed = "Cập nhật sản phẩm thất bại !";
+        public const string UpdateRoleFailed = "Cập nhật quyền thất bại !";
+        public const string UpdateRoleSuccessed = "Cập nhật quyền thành công !";
     }
 }
