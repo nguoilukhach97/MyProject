@@ -1,9 +1,13 @@
 ﻿ using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MyProject.Application.Auth;
+using MyProject.Application.Auth.Dtos;
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
+using MyProject.Common;
 using MyProject.Data.Entities;
 using MyProject.Utilities.Exceptions;
 using System;
@@ -23,68 +27,76 @@ namespace MyProject.Application.System.User
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<AppRole> _roleManager;
         private readonly IConfiguration _config;
-
+        private readonly IJwtToken _jwtToken;
         public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
             RoleManager<AppRole> roleManager,
-            IConfiguration config)
+            IConfiguration config,IJwtToken jwtToken)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _jwtToken = jwtToken;
             _config = config; 
         }
-        public async Task<ApiResult<string>> Authenticate(LoginRequest request)
+                        
+        #region
+
+        public async Task<AuthenticateResponse> AuthenticateAsync(LoginRequest request)
         {
-            var user = await _userManager.FindByNameAsync(request.UserName);
-            if (user == null) return new ApiResult<string>(false, "Người dùng không tồn tại");
-
-            var result = await _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, true);
-            if (!result.Succeeded)
+            var failResponse = new AuthenticateResponse()
             {
-                return new ApiResult<string>(false, "Sai mật khẩu");
+                Successed = false,
+                Errors = new Error() {Code = "login_failure",Description= CommonMessage.LoginFailed }
+            };
+            if (request == null || string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.Password))
+            {
+                return failResponse;
             }
-            var roles = _userManager.GetRolesAsync(user);
-
-            var claims = new[]
+            var user = await _userManager.FindByNameAsync(request.UserName);
+            if (user== null)
             {
-                new Claim(ClaimTypes.Email,user.Email),
-                new Claim(ClaimTypes.GivenName,user.LastName),
-                new Claim(ClaimTypes.Role,string.Join(";",roles)),
-                new Claim(ClaimTypes.Name,request.UserName)
-            };
+                return failResponse;
+            }    
+            var checkPass = await _signInManager.PasswordSignInAsync(request.UserName,request.Password,request.RememberMe,false);
 
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(_config["Tokens:Issuer"],
-                _config["Tokens:Issuer"],
-                claims,
-                expires: DateTime.Now.AddHours(3),
-                signingCredentials: creds);
-
-            var successToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return new ApiResult<string>
+            if (!checkPass.Succeeded)
             {
-                IsSuccessed = true,
-                Result = successToken
+                return failResponse;
+            }                
+           
+            var roles = await _userManager.GetRolesAsync(user);
+            string token = _jwtToken.GenerateToken(user.Id,roles,user.UserName);
 
+            var resultSuccess = new AuthenticateResponse()
+            {
+                AccessToken = token,
+                Successed = true
             };
+            return resultSuccess;
         }
 
-        
-
-        public async Task<ApiResult<bool>> Register(RegisterRequest request)
+        public async Task<ResponseBase> Register(RegisterRequest request)
         {
+            var failResponse = new AuthenticateResponse()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "register_failure", Description = CommonMessage.RegisterFailed }
+            };
+
             var checkUser = await _userManager.FindByNameAsync(request.UserName);
+
             if (checkUser != null)
             {
-                return new ApiResult<bool>(false,"Tài khoản đã tồn tại ");
+                return failResponse;
             }
             if (await _userManager.FindByEmailAsync(request.Email) != null)
             {
-
+                var failResponseEmail = new AuthenticateResponse()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "register_failed", Description = CommonMessage.EmailAlreadyExists }
+                };
+                return failResponse;
             }
             var user = new AppUser()
             {
@@ -95,45 +107,221 @@ namespace MyProject.Application.System.User
                 UserName = request.UserName,
                 PhoneNumber = request.PhoneNumber
             };
-
-            var result = await _userManager.CreateAsync(user,request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {
-                return true;
+                var successResponse = new AuthenticateResponse()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "register_success", Description = CommonMessage.RegisterSuccessed }
+                };
+                return successResponse;
             }
-            return false;
+            return failResponse;
+
+
+        }
+
+        public async Task<ResponseBase> ChangePassword(Guid id,string currentPass, string newPass)
+        {
+            var failResponse = new AuthenticateResponse()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "change_pass_failure", Description = CommonMessage.ChangePasswordFail }
+            };
+
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return failResponse;
+            }
+            else
+            {
+                var result = await _userManager.ChangePasswordAsync(user,currentPass, newPass);
+                if (result.Succeeded)
+                {
+                    var successResponse = new AuthenticateResponse()
+                    {
+                        Successed = true,
+                        Errors = new Error() { Code = "change_pass_success", Description = CommonMessage.ChangePasswordSuccessed }
+                    };
+                    return successResponse;
+                }
+                return failResponse;
+            }
+        }
+
+        public async Task<ResponseBase> UpdateAsync(Guid id, UpdateUserRequest request )
+        {
+            var failResponse = new AuthenticateResponse()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "change_pass_failure", Description = CommonMessage.UpdateFailed }
+            };
+            if (await _userManager.Users.AnyAsync(x=>x.Email == request.Email && x.Id != id))
+            {
+                var failEmail = new ResponseBase()
+                {
+                    Successed = false,
+                    Errors = new Error() { Code = "update_failed", Description = CommonMessage.EmailAlreadyExists}
+
+                };
+                return failEmail;
+            }
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return failResponse;
+            }
+
+            user.FirstName = request.FirtsName;
+            user.LastName = request.LastName;
+            user.Dob = request.Dob;
+            user.Email = request.Email;
+            user.PhoneNumber = request.PhoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                var success = new ResponseBase()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "update_success", Description = CommonMessage.UpdateSuccessed }
+
+                };
+                return success;
+            }
+            return failResponse;
+        }
+
+        public async Task<ResponseBase> UpdateRoles(Guid id, ListRoles role)
+        {
+            var response = new ResponseBase()
+            {
+                Successed=false,
+                Errors = new Error() { Code ="update_role_failed",Description = CommonMessage.UpdateRoleFailed}
+            };
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                response.Errors.Description = CommonMessage.CannotFind;
+                return response;
+            }
+            var removeRoles = role.Roles.Where(x => x.IsSelected == false).Select(x => x.Name).ToList();
+            await _userManager.RemoveFromRolesAsync(user,removeRoles);
+            var addRoles = role.Roles.Where(x => x.IsSelected).Select(x => x.Name).ToList();
+            foreach (var item in addRoles)
+            {
+                if (await _userManager.IsInRoleAsync(user,item) == false)
+                {
+                    await _userManager.AddToRoleAsync(user, item);
+                }
+                
+            }
+            var responseSucced = new ResponseBase()
+            {
+                Successed = true,
+                Errors = new Error() { Code = "update_role_success", Description = CommonMessage.UpdateRoleSuccessed }
+            };
+
+            return responseSucced;
+
+        }
+
+        public async Task<ResponseBase> DeleteAsync(Guid id)
+        {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "delete_failed", Description = CommonMessage.DeleteFailed}
+            };
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                response.Errors.Description = CommonMessage.CannotFind;
+                return response;
+            }
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                var responseSuccessed = new ResponseBase()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "delete_success", Description = CommonMessage.DeleteSuccessed }
+                };
+                return responseSuccessed;
+            }
+            return response;
+        }
+
+        public async Task<UserResponse<UserViewModel>> GetUserById(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return new UserResponse<UserViewModel>()
+                {
+                    Successed = false,
+                    Errors = new Error() { Code = "not_find_user", Description = CommonMessage.FindUserByIdFailed }
+                };
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            var result = new UserViewModel()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                UserName = user.UserName,
+                Roles = roles
+            };
+            var successed = new UserResponse<UserViewModel>()
+            {
+                Object = result,
+                Successed = true,
+                Errors = new Error() { Code = "find_user_successed", Description = CommonMessage.FindUserByIdSuccessed }
+            };
+            
+            return successed;
         }
 
 
-        public async Task<ApiResult<PagedViewResult<UserViewModel>>> GetUserPaging(GetUserPagingRequest request)
+        public async Task<Pagination<UserViewModel>> GetUserPaging(SearchingBase request)
         {
             var query = _userManager.Users;
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                query = query.Where(x => x.UserName.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
+                query = query.Where(x => x.UserName.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword)
+                || x.Email.Contains(request.Keyword));
             }
 
             int totalRow = await query.CountAsync();
 
-            var data = await query.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize)
+            var data = await query.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize)
                 .Select(x => new UserViewModel()
                 {
                     Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
-                    PhoneNumber =x.PhoneNumber,
+                    PhoneNumber = x.PhoneNumber,
                     Email = x.Email,
                     UserName = x.UserName
                 }).ToListAsync();
 
-            var pagedResult = new PagedViewResult<UserViewModel>()
+            var pagedResult = new Pagination<UserViewModel>()
             {
-                TotalRecord = totalRow,
-                Items = data
+                CurrentPage = request.PageIndex,
+                PageSize = request.PageSize,
+                TotalPages = totalRow % request.PageSize == 0 ? totalRow / request.PageSize : totalRow / request.PageSize + 1,
+                TotalRows = totalRow,
+                Data = data
             };
 
             return pagedResult;
-        }
 
+           
+        }
+        #endregion
     }
 }

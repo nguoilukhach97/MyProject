@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MyProject.Application.Auth;
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Application.Service;
@@ -59,6 +60,7 @@ namespace MyProject.API
             services.AddTransient<SignInManager<AppUser>,SignInManager<AppUser>>();
             services.AddTransient<RoleManager<AppRole>,RoleManager<AppRole>>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IJwtToken, JwtToken>();
 
             //services.AddTransient<IValidator<LoginRequest>,LoginRequestValidator>();
 

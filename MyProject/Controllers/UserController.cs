@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
+using MyProject.Common;
 using MyProject.Service;
 
 namespace MyProject.Controllers
@@ -32,12 +33,12 @@ namespace MyProject.Controllers
         public async Task<IActionResult> Index(string keyword, int pageIndex=1, int pageSize=2)
         {
             var sessions = HttpContext.Session.GetString("Token");
-            var request = new GetUserPagingRequest()
+            var request = new SearchingBase()
             {
-                BearerToken = sessions,
+               
                 Keyword = keyword,
-                pageIndex = pageIndex,
-                pageSize= pageSize
+                PageIndex = pageIndex,
+                PageSize = pageSize
             };
             var data = await _userApi.GetUserPaging(request);
             return View(data);
@@ -47,6 +48,7 @@ namespace MyProject.Controllers
         public async Task<IActionResult> Login()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            
             return View();
         }
 
@@ -64,7 +66,8 @@ namespace MyProject.Controllers
                 ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
                 IsPersistent = true
             };
-            HttpContext.Session.SetString("Token",token); 
+            HttpContext.Session.SetString("Token",token);
+            SetCookie(token);
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 userPrincipal,
@@ -115,6 +118,20 @@ namespace MyProject.Controllers
 
             return principal;
 
+        }
+
+        public void SetCookie(string value)
+        {
+            string key = "token";
+            int expireTime = DateTime.Now.AddHours(1).Second;
+            CookieOptions option = new CookieOptions();
+
+            //if (expireTime.HasValue)
+            //    option.Expires = DateTime.Now.AddMinutes(expireTime.Value);
+            //else
+            //    option.Expires = DateTime.Now.AddMilliseconds(10);
+
+            Response.Cookies.Append(key, value, option);
         }
     }
 }

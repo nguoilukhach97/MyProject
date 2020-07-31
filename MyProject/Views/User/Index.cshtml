@@ -1,52 +1,62 @@
-﻿@using  MyProject.Application.ModelRequestService.ModelCommon;
-@model PagedViewResult<MyProject.Application.ModelRequestService.ServiceRequest.User.UserViewModel>
+﻿@using  MyProject.Common;
+@model Pagination<MyProject.Application.ModelRequestService.ServiceRequest.User.UserViewModel>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <div class="container-fluid">
-        <h1 class="mt-4">Danh sách người dùng</h1>
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="index.html">Người dùng</a></li>
-            <li class="breadcrumb-item active">Danh sách</li>
-        </ol>
-        
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-table mr-1"></i>
-                Người dùng
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" width="100%" cellspacing="0">
-                        <thead>
+<div class="container-fluid">
+    <h1 class="mt-4">Danh sách người dùng</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="index.html">Người dùng</a></li>
+        <li class="breadcrumb-item active">Danh sách</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table mr-1"></i>
+            Người dùng
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Phone Number</th>
+                            <th>Email</th>
+                            <th>UserName</th>
+                            <th>Tùy chọn</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.Data)
+                        {
                             <tr>
-                                <th>Id</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Phone Number</th>
-                                <th>Email</th>
-                                <th>UserName</th>
+                                
+                                <td>@item.FirstName</td>
+                                <td>@item.LastName</td>
+                                <td>@item.PhoneNumber</td>
+                                <td>@item.Email</td>
+                                <td>@item.UserName</td>
+                                <td style="display:flex; margin:5px;">
+                                    <button type="button" class="btn btn-sm btn-success" style="margin-right:5px;">Sửa</button>
+                                    <form>
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                                    </form>
+                                    
+                                </td>
                             </tr>
-                        </thead>
-                        
-                        <tbody>
-                            @foreach (var item in Model.Items)
-                            {
-                                <tr>
-                                    <td>@item.Id</td>
-                                    <td>@item.FirstName</td>
-                                    <td>@item.LastName</td>
-                                    <td>@item.PhoneNumber</td>
-                                    <td>@item.Email</td>
-                                    <td>@item.UserName</td>
-                                </tr>
-                            }
+                        }
 
 
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
             </div>
+            @await Component.InvokeAsync("Pager",new PaingBase() { CurrentPage=Model.CurrentPage,PageSize=Model.PageSize,TotalRows=Model.TotalRows})
         </div>
     </div>
+</div>

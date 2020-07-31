@@ -3,21 +3,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyProject.Application.ModelRequestService.ServiceRequest
+namespace MyProject.Application.ModelRequestService.ServiceRequest.Product
 {
-    public class ProductCreateRequest
+    public class ProductUpdateRequest
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public int BrandId { get; set; }
-        
+
         public string Description { get; set; }
         public string Details { get; set; }
-        public DateTime DateCreated { get; set; }
-        public int UserCreated { get; set; }
-        public int ViewCount { get; set; }
+        
+        public int? UserModified { get; set; }
+        
 
         public bool Status { get; set; }
 
-        public IFormFile ImageProduct { get; set; }
+        public IFormFile ProductImage { get; set; }
     }
 }

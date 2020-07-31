@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyProject.Application.Auth.Dtos;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Application.System.User;
+using MyProject.Common;
 
 namespace MyProject.API.Controllers
 {
@@ -28,21 +30,22 @@ namespace MyProject.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost("Authenticate")]
+        [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromBody] LoginRequest requets)
+        public async Task<IActionResult> Login([FromBody] LoginRequest requets)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(requets);
             }
-            var resultToken = await _userService.Authenticate(requets);
-            if (string.IsNullOrEmpty(resultToken))
+            var resultToken = await _userService.AuthenticateAsync(requets);
+            if (!resultToken.Successed)
             {
-                return BadRequest("Username or Password is incorrect");
+                return BadRequest(requets);
             }
-            return Ok(resultToken);
+            return Ok(resultToken.AccessToken);
         }
+        
         [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequest requets)
@@ -52,16 +55,59 @@ namespace MyProject.API.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _userService.Register(requets);
-            if (!result)
+            if (result.Successed)
             {
-                return BadRequest("Register khong duoc");
+                return Ok();
             }
-            return Ok();
+            return BadRequest(result.Errors);
         }
-        
+        [HttpPut]
+        public async Task<IActionResult> ChangePassword(Guid id, string currentPass, string newPass)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var result = await _userService.ChangePassword(id, currentPass, newPass);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(Guid id,[FromBody] UpdateUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _userService.UpdateAsync(id, request);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/role")]
+        public async Task<IActionResult> UpdateRoleAsync(Guid id, [FromBody] ListRoles request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _userService.UpdateRoles(id, request);
+            return Ok(result);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var result = await _userService.DeleteAsync(id);
+            return Ok(result);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            var result = await _userService.GetUserById(id);
+            return Ok(result);
+        }
 
         [HttpGet("paging")]
-        public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)
+        public async Task<IActionResult> GetAllPaging([FromQuery] SearchingBase request)
         {
             var data = await _userService.GetUserPaging(request);
 

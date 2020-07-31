@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyProject.Application.ModelRequestService.ServiceRequest
+namespace MyProject.Application.ModelRequestService.ServiceRequest.Product
 {
-    public class ProductDetailUpdateRequest
+    public class ProductDetailCreateRequest
     {
-        public int Id { get; set; }
+       
         public int ProductId { get; set; }
         
         public decimal Price { get; set; }
@@ -14,9 +14,9 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest
         public int Quantity { get; set; }
         public int Warranty { get; set; }
         public int Size { get; set; }
-
-        public DateTime? DateModified { get; set; }
-        public int? UserModified { get; set; }
+        public DateTime DateCreated { get; set; }
+        public int UserCreated { get; set; }
+        
         public bool Status { get; set; }
     }
 }

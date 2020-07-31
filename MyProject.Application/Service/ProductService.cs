@@ -2,7 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.PublicRequest;
-using MyProject.Application.ModelRequestService.ServiceRequest;
+using MyProject.Application.ModelRequestService.ServiceRequest.Product;
+using MyProject.Common;
 using MyProject.Data.EF;
 using MyProject.Data.Entities;
 using MyProject.Utilities.Exceptions;
@@ -26,16 +27,21 @@ namespace MyProject.Application.Service
             _context = context;
             _storageService = service;
         }
-        #region Manage
-        public async Task<int> CreateProduct(ProductCreateRequest request)
+        #region Manage product
+        public async Task<ResponseBase> CreateProduct(ProductCreateRequest request)
         {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "add_product_failed",Description = CommonMessage.CreateproductFailed}
+            };
             var product = new Product()
             {
                 Name = request.Name,
                 BrandId = request.BrandId,
                 Description = request.Description,
                 Details = request.Details,
-                DateCreated = request.DateCreated,
+                DateCreated = DateTime.Now.Date,
                 UserCreated = request.UserCreated,
                 ViewCount =0,
                 Status = request.Status
@@ -59,12 +65,27 @@ namespace MyProject.Application.Service
             }
 
             await _context.Products.AddAsync(product);
+            var result = await _context.SaveChangesAsync();
+            if (result >0)
+            {
+                var responseSuccess = new ResponseBase()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "add_product_success", Description = CommonMessage.CreateproductSuccessed }
+                };
+                return responseSuccess;
+            }
             //_context.ProductImages.AddRange(product.ProductImages);
-            return await _context.SaveChangesAsync();
+            return response;
         }
 
-        public async Task<int> CreateProductDetail(ProductDetailCreateRequest request)
+        public async Task<ResponseBase> CreateProductDetail(ProductDetailCreateRequest request)
         {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "add_product_failed", Description = CommonMessage.CreateproductFailed }
+            };
             var productDetail = new ProductDetail()
             {
                 ProductId = request.ProductId,
@@ -81,11 +102,28 @@ namespace MyProject.Application.Service
             };
 
             await _context.ProductDetails.AddAsync(productDetail);
-            return await _context.SaveChangesAsync();
+            var result =  await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                var responseSuccess = new ResponseBase()
+                {
+                    Successed = true,
+                    Errors = new Error() { Code = "add_detailproduct_success", Description = CommonMessage.CreateproductSuccessed }
+                };
+                return responseSuccess;
+            }
+
+            return response;
         }
 
-        public async Task<int> DeleteProduct(int id)
+        public async Task<ResponseBase> DeleteProduct(int id)
         {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "delete_product_failed", Description = CommonMessage.DeleteproductFailed }
+            };
+            
             var product = await _context.Products.FindAsync(id);
             if(product != null)
             {
@@ -102,28 +140,62 @@ namespace MyProject.Application.Service
                 
 
                 _context.Products.Remove(product);
-                return await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    var responseSuccess = new ResponseBase()
+                    {
+                        Successed = true,
+                        Errors = new Error() { Code = "delete_product_success", Description = CommonMessage.DeleteproductSuccessed }
+                    };
+                    return responseSuccess;
+                }
+                return response;
             }
 
-            throw new MyProjectException($"Cannot find a product : {id}");
+            response.Errors.Description = CommonMessage.CannotFind;
+            return response;
         }
 
-        public async Task<int> DeleteProductDetail(int idDetail)
+        public async Task<ResponseBase> DeleteProductDetail(int idDetail)
         {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "delete_product_failed", Description = CommonMessage.DeleteproductFailed }
+            };
+
             var productDetail = await _context.ProductDetails.FindAsync(idDetail);
             if (productDetail != null)
             {
                 _context.ProductDetails.Remove(productDetail);
-                return await _context.SaveChangesAsync();
+                var result =  await _context.SaveChangesAsync();
+                if (result > 0 )
+                {
+                    var responseSuccess = new ResponseBase()
+                    {
+                        Successed = true,
+                        Errors = new Error() { Code = "delete_product_success", Description = CommonMessage.DeleteproductSuccessed }
+                    };
+                    return responseSuccess;
+                }
             }
 
-            throw new MyProjectException($"Cannot find a detail Product with detail id : {idDetail}");
+            response.Errors.Description = CommonMessage.CannotFind;
+
+            return response;
+            
         }
 
         
 
-        public async Task<int> UpdateProduct(ProductUpdateRequest request)
+        public async Task<ResponseBase> UpdateProduct(ProductUpdateRequest request)
         {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "update_product_failed", Description = CommonMessage.UpdateProductFailed }
+            };
             var product = await _context.Products.FindAsync(request.Id);
             if(product !=null)
             {
@@ -131,7 +203,7 @@ namespace MyProject.Application.Service
                 product.BrandId = request.BrandId;
                 product.Description = request.Description;
                 product.Details = request.Details;
-                product.DateModified = request.DateModified;
+                product.DateModified = DateTime.Now.Date;
                 product.UserModified = request.UserModified;
                 product.Status = request.Status;
 
@@ -147,15 +219,34 @@ namespace MyProject.Application.Service
                     }
                 }    
 
-                return await _context.SaveChangesAsync();
+                var result =  await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    var responseSuccess = new ResponseBase()
+                    {
+                        Successed = true,
+                        Errors = new Error() { Code = "update_product_successed", Description = CommonMessage.UpdateProductSuccessed }
+                    };
+                    return responseSuccess;
+                }
+
+                return response;
             }
 
-            throw new MyProjectException($"Cannot find a  Product with id : {request.Id}");
+            response.Errors.Description = CommonMessage.CannotFind;
+            return response;
+            
 
         }
 
-        public async Task<int> UpdateProductDetail(ProductDetailUpdateRequest request)
+        public async Task<ResponseBase> UpdateProductDetail(ProductDetailUpdateRequest request)
         {
+            var response = new ResponseBase()
+            {
+                Successed = false,
+                Errors = new Error() { Code = "update_product_failed", Description = CommonMessage.UpdateProductSuccessed }
+            };
             var productDetail = await _context.ProductDetails.FindAsync(request.Id);
             if (productDetail != null)
             {
@@ -169,10 +260,20 @@ namespace MyProject.Application.Service
                 productDetail.UserModified = request.UserModified ;
                 productDetail.Status =request.Status;
 
-                return await _context.SaveChangesAsync();
+                var result =  await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    var responseSuccess = new ResponseBase()
+                    {
+                        Successed = true,
+                        Errors = new Error() { Code = "update_product_successed", Description = CommonMessage.UpdateProductSuccessed }
+                    };
+                    return responseSuccess;
+                }
             }
 
-            throw new MyProjectException($"Cannot find a detail Product with detail id : {request.Id}");
+            response.Errors.Description = CommonMessage.CannotFind;
+            return response;
         }
 
         public async Task UpdateViewCount(int id)
@@ -186,9 +287,9 @@ namespace MyProject.Application.Service
             }
         }
 
-
+        #endregion
         // Save Image
-
+        #region Manage Image
         private async Task<string> SaveFile(IFormFile file)
         {
             var originalFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
@@ -280,63 +381,73 @@ namespace MyProject.Application.Service
 
         #region Public 
 
-        public async Task<PagedViewResult<Product>> GetAllByCategory()
+        public async Task<Pagination<Product>> GetAllByCategory(SearchingBase request)
         {
             var product = _context.Products.OrderBy(p => p.Name);
-            var data = new PagedViewResult<Product>()
-            {
-                Items = await product.ToListAsync(),
-                TotalRecord = await product.CountAsync()
-            };
-
-            return data;
-        }
-
-        public async Task<PagedViewResult<ProductViewModel>> GetAllPaging(ProductPaingParam request)
-        {
-            var product =(from a in _context.Products
-                           join b in _context.ProductDetails on a.Id equals b.ProductId
-                           join c in _context.ProductInCategories on a.Id equals c.ProductId
-                           join d in _context.Categories on c.CategoyId equals d.Id
-                           join e in _context.ProductImages on a.Id equals e.ProductId
-                           join f in _context.Brands on a.BrandId equals f.Id
-                           where request.CategoryId.Contains(d.Id)
-                           group new { a, b, d, e, f } by new 
-                           { a.Id, a.Name,BrandId=f.Id,CategoryId=d.Id, NameBrand=f.Name, e.ImagePath,a.Description,a.Details,a.DateCreated,a.ViewCount,a.Status } into gr
-                           select new ProductViewModel()
-                           {
-                               Id = gr.Key.Id,
-                               Name = gr.Key.Name,
-                               BrandId = gr.Key.BrandId,
-                               CategoryId = gr.Key.CategoryId,
-                               BrandName = gr.Key.NameBrand,
-                               PriceStart = gr.Min(p=>p.b.PromotionPrice),
-                               PriceEnd = gr.Max(p=>p.b.PromotionPrice),
-                               Description = gr.Key.Description,
-                               Details = gr.Key.Details,
-                               DateCreated = gr.Key.DateCreated,
-                               ViewCount = gr.Key.ViewCount,
-                               Status = gr.Key.Status
-                           });
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                product = product.Where(p => p.Name.Contains(request.Keyword) || p.Description.Contains(request.Keyword));
+                product = product.Where(x => x.Name.Contains(request.Keyword) || x.Description.Contains(request.Keyword) ).OrderBy(x=>x.Name);
             }
-            if(request.CategoryId.Count()>0)
-            {
-                product = product.Where(p => request.CategoryId.Contains(p.CategoryId));
-                
-            }
-            int totalRow = await product.CountAsync();
-            var data = await product.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize).ToListAsync();
-            var result = new PagedViewResult<ProductViewModel>()
-            {
-                Items = data,
-                TotalRecord = totalRow
-            };
+            var totalRow = await product.CountAsync();
+            var data = await product.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
+            var result = new Pagination<Product>()
+            {
+                CurrentPage = request.PageIndex,
+                PageSize = request.PageSize,
+                TotalPages = totalRow % request.PageSize == 0 ? totalRow / request.PageSize : totalRow / request.PageSize + 1,
+                TotalRows = totalRow,
+                Data =data
+            };
+           
             return result;
         }
+
+        //public async Task<PagedViewResult<ProductViewModel>> GetAllPaging(ProductPaingParam request)
+        //{
+        //    var product =(from a in _context.Products
+        //                   join b in _context.ProductDetails on a.Id equals b.ProductId
+        //                   join c in _context.ProductInCategories on a.Id equals c.ProductId
+        //                   join d in _context.Categories on c.CategoyId equals d.Id
+        //                   join e in _context.ProductImages on a.Id equals e.ProductId
+        //                   join f in _context.Brands on a.BrandId equals f.Id
+        //                   where request.CategoryId.Contains(d.Id)
+        //                   group new { a, b, d, e, f } by new 
+        //                   { a.Id, a.Name,BrandId=f.Id,CategoryId=d.Id, NameBrand=f.Name, e.ImagePath,a.Description,a.Details,a.DateCreated,a.ViewCount,a.Status } into gr
+        //                   select new ProductViewModel()
+        //                   {
+        //                       Id = gr.Key.Id,
+        //                       Name = gr.Key.Name,
+        //                       BrandId = gr.Key.BrandId,
+        //                       CategoryId = gr.Key.CategoryId,
+        //                       BrandName = gr.Key.NameBrand,
+        //                       PriceStart = gr.Min(p=>p.b.PromotionPrice),
+        //                       PriceEnd = gr.Max(p=>p.b.PromotionPrice),
+        //                       Description = gr.Key.Description,
+        //                       Details = gr.Key.Details,
+        //                       DateCreated = gr.Key.DateCreated,
+        //                       ViewCount = gr.Key.ViewCount,
+        //                       Status = gr.Key.Status
+        //                   });
+        //    if (!string.IsNullOrEmpty(request.Keyword))
+        //    {
+        //        product = product.Where(p => p.Name.Contains(request.Keyword) || p.Description.Contains(request.Keyword));
+        //    }
+        //    if(request.CategoryId.Count()>0)
+        //    {
+        //        product = product.Where(p => request.CategoryId.Contains(p.CategoryId));
+                
+        //    }
+        //    int totalRow = await product.CountAsync();
+        //    var data = await product.Skip((request.pageIndex - 1) * request.pageSize).Take(request.pageSize).ToListAsync();
+        //    var result = new PagedViewResult<ProductViewModel>()
+        //    {
+        //        Items = data,
+        //        TotalRecord = totalRow
+        //    };
+
+        //    return result;
+        //}
 
         #endregion
 
