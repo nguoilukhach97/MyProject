@@ -38,10 +38,7 @@ namespace MyProject.API.Controllers
                 return BadRequest(requets);
             }
             var resultToken = await _userService.AuthenticateAsync(requets);
-            if (!resultToken.Successed)
-            {
-                return BadRequest(requets);
-            }
+            
             return Ok(resultToken.AccessToken);
         }
         
@@ -54,11 +51,7 @@ namespace MyProject.API.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _userService.Register(requets);
-            if (result.Successed)
-            {
-                return Ok();
-            }
-            return BadRequest(result.Errors);
+            return Ok(result);
         }
         [HttpPut]
         public async Task<IActionResult> ChangePassword(Guid id, string currentPass, string newPass)

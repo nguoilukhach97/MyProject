@@ -32,7 +32,18 @@ namespace MyProject.API.Controllers
             var result = await _service.GetAllByCategory(request);
             return Ok(result);
         }
-
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDetailAsync(int id,[FromQuery] SearchingBase request)
+        {
+            var result = await _service.GetAllSize(id, request);
+            return Ok(result);
+        }
+        [HttpGet("{id}/images")]
+        public async Task<IActionResult> GetDetailsAsync(int id)
+        {
+            var result = await _service.GetListImages(id);
+            return Ok(result);
+        }
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromForm] ProductCreateRequest request)
         {
@@ -40,6 +51,12 @@ namespace MyProject.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("details")]
+        public async Task<IActionResult> PostAsync([FromForm]ProductDetailCreateRequest request)
+        {
+            var result = await _service.CreateProductDetail(request);
+            return Ok(result);
+        }
         [HttpPut]
         public async Task<IActionResult> PutAsync([FromForm] ProductUpdateRequest request)
         {

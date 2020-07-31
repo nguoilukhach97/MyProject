@@ -11,7 +11,7 @@ using MyProject.Models;
 namespace MyProject.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 

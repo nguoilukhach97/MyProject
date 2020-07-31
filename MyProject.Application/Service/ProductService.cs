@@ -95,7 +95,7 @@ namespace MyProject.Application.Service
                 Quantity = request.Quantity,
                 Warranty= request.Warranty,
                 Size = request.Size,
-                DateCreated = request.DateCreated,
+                DateCreated = DateTime.Now.Date,
                 UserCreated = request.UserCreated,
 
                 Status =request.Status,
@@ -400,6 +400,28 @@ namespace MyProject.Application.Service
                 Data =data
             };
            
+            return result;
+        }
+
+        public async Task<Pagination<ProductDetail>> GetAllSize(int id,SearchingBase request)
+        {
+            var productDetails = _context.ProductDetails.Where(x=>x.ProductId == id);
+            if (!string.IsNullOrEmpty(request.Keyword))
+            {
+                productDetails = productDetails.Where(x => x.Size.ToString().Contains(request.Keyword));
+            }
+            var totalRow = await productDetails.CountAsync();
+            var data = await productDetails.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+
+            var result = new Pagination<ProductDetail>()
+            {
+                CurrentPage = request.PageIndex,
+                PageSize = request.PageSize,
+                TotalPages = totalRow % request.PageSize == 0 ? totalRow / request.PageSize : totalRow / request.PageSize + 1,
+                TotalRows = totalRow,
+                Data = data
+            };
+
             return result;
         }
 

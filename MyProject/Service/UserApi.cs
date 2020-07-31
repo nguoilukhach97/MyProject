@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using MyProject.Application;
 using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Common;
@@ -30,7 +31,6 @@ namespace MyProject.Service
             var json = JsonConvert.SerializeObject(request);
             var httpContent = new StringContent(json,Encoding.UTF8,"application/json");
 
-
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration["BaseAddress"]);
             var response =await client.PostAsync("/Api/User",httpContent);
@@ -57,7 +57,7 @@ namespace MyProject.Service
             return users;
         }
 
-        public async Task<bool> RegisterUser(RegisterRequest request)
+        public async Task<ResponseBase> RegisterUser(RegisterRequest request)
         {
             var client = _httpClientFactory.CreateClient();
             var json = JsonConvert.SerializeObject(request);
@@ -66,9 +66,42 @@ namespace MyProject.Service
             
             var response = await client.PostAsync($"/api/user/register",httpContent);
 
+            var data = await response.Content.ReadAsStringAsync();
+            var register = JsonConvert.DeserializeObject<ResponseBase>(data);
+
+            return register;
+        }
+
+        public async Task<ResponseBase> Delete(Guid id)
+        {
+            var session = _httpContextAccessor.HttpContext.Request.Cookies["token"];
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
+            var response = await client.DeleteAsync($"/api/user/{id}");
+            var body = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<ResponseBase>(body);
+
+            return JsonConvert.DeserializeObject<ResponseBase>(body);
+        }
+
+        public async Task<ResponseBase> UpdateUser(Guid id, UpdateUserRequest request)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+            var session = _httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
+
+            var json = JsonConvert.SerializeObject(request);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync($"/api/user/{id}", httpContent);
+            var result = await response.Content.ReadAsStringAsync();
             
 
-            return response.IsSuccessStatusCode;
+            return JsonConvert.DeserializeObject<ResponseBase>(result);
         }
     }
 }

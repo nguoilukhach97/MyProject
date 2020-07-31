@@ -21,7 +21,7 @@
                 <table class="table table-bordered" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            
+
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Phone Number</th>
@@ -35,19 +35,15 @@
                         @foreach (var item in Model.Data)
                         {
                             <tr>
-                                
+
                                 <td>@item.FirstName</td>
                                 <td>@item.LastName</td>
                                 <td>@item.PhoneNumber</td>
                                 <td>@item.Email</td>
                                 <td>@item.UserName</td>
                                 <td style="display:flex; margin:5px;">
-                                    <button type="button" class="btn btn-sm btn-success" style="margin-right:5px;">Sửa</button>
-                                    <form>
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-                                    </form>
-                                    
+                                    <button type="button" data-id="@item.Id" class="btn btn-sm btn-success update-user" style="margin-right:5px;">Sửa</button>
+                                    <button type="button" data-id="@item.Id" class="btn btn-sm btn-danger delete-user">Xóa</button>
                                 </td>
                             </tr>
                         }
@@ -56,7 +52,130 @@
                     </tbody>
                 </table>
             </div>
-            @await Component.InvokeAsync("Pager",new PaingBase() { CurrentPage=Model.CurrentPage,PageSize=Model.PageSize,TotalRows=Model.TotalRows})
+            @await Component.InvokeAsync("Pager", new PaingBase() { CurrentPage = Model.CurrentPage, PageSize = Model.PageSize, TotalRows = Model.TotalRows })
         </div>
     </div>
 </div>
+
+@*modal update*@
+
+<div class="modal fade" id="modal-update" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Cập nhật người dùng</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form method="post" asp-action="UpdateUser" asp-controller="User">
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-1 col-sm-1"></div>
+                        <div class="col-md-10 col-sm-10">
+                            <div class="x_panel">
+                                <div class="x_content">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="field item form-group">
+                                        <input type="hidden" name="id" id="Id" />
+
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
+                                            First name :<span class="required">*</span>
+                                            
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+
+                                            <input type="text" class="form-control" maxlength="100" name="FirtsName" id="Name"
+                                                   required="required" />
+                                        </div>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
+                                            Last name :<span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+
+                                            <input type="text" class="form-control" name="LastName" id="last-name"
+                                                   required="required" />
+                                        </div>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
+                                            Date of birth :<span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+
+                                            <input type="date" class="form-control" max="1/1/2020" min="1/1/1900" name="Dob" id="dob" required />
+                                        </div>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
+                                            Email :<span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+
+                                            <input type="email" class="form-control" name="Email" id="email" required />
+                                        </div>
+                                    </div>
+
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">
+                                            Phone number : <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-8">
+                                            <input class="form-control number" type="text" pattern="[0-9]{9,12}" name="PhoneNumber" id="PhoneNumber" required='required'>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type='reset' class="btn btn-info">Reset</button>
+                    <button type="submit" class="btn btn-success">Lưu lại</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@*end modal update*@
+
+@*modal delete*@
+
+
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Bạn có chắc chắn muốn xóa ?</h2>
+            </div>
+            <div class="modal-body">
+                Khi ấn xác nhận sẽ xóa người dùng
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Hủy bỏ</button>
+                <form method="post" asp-controller="User" asp-action="Delete">
+                    <input type="hidden" id="id-delete" name="id" />
+                    <button type="submit" class="btn btn-danger btn-ok">Xác nhận</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+@*end modal delete*@
+
+@section js
+{
+
+    <script src="~/js/user.js"></script>
+}

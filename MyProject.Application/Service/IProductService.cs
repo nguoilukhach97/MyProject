@@ -40,8 +40,10 @@ namespace MyProject.Application.Service
 
        
         Task<Pagination<Product>> GetAllByCategory(SearchingBase request);
+
+        Task<Pagination<ProductDetail>> GetAllSize(int id, SearchingBase request);
         #endregion
-        
+
 
     }
 }

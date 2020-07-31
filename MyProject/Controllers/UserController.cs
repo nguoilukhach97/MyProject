@@ -32,7 +32,7 @@ namespace MyProject.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string keyword, int pageIndex=1, int pageSize=2)
         {
-            var sessions = HttpContext.Session.GetString("Token");
+            //var sessions = HttpContext.Session.GetString("Token");
             var request = new SearchingBase()
             {
                
@@ -41,6 +41,10 @@ namespace MyProject.Controllers
                 PageSize = pageSize
             };
             var data = await _userApi.GetUserPaging(request);
+            if (TempData["result"] != null)
+            {
+                ViewBag.SuccessMsg = TempData["result"];
+            }
             return View(data);
         }
 
@@ -56,22 +60,32 @@ namespace MyProject.Controllers
         public async Task<IActionResult> Login(LoginRequest request)
         {
             if (!ModelState.IsValid)
-                return View(ModelState);
+            {
+               
+                return View();
+            }    
+                
 
             var token = await _userApi.Authenticate(request);
-
+            if (string.IsNullOrEmpty(token))
+            {
+                ViewBag.SuccessMsg = "Tài khoản hoặc mật khẩu sai !";
+                return View(request);
+            }
             var userPrincipal = this.ValidateToken(token);
             var authProperties = new AuthenticationProperties
             {
                 ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
                 IsPersistent = true
             };
-            HttpContext.Session.SetString("Token",token);
+            //HttpContext.Session.SetString("Token",token);
             SetCookie(token);
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 userPrincipal,
                 authProperties);
+            
+
             return RedirectToAction("Index","Home");
         }
 
@@ -79,8 +93,26 @@ namespace MyProject.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            HttpContext.Session.Remove("Token");
+            //HttpContext.Session.Remove("Token");
+            Response.Cookies.Delete("token");
             return RedirectToAction("Login","User");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            if (!ModelState.IsValid)
+                return View();
+
+            var result = await _userApi.Delete(id);
+            if (result.Successed)
+            {
+                TempData["result"] = "Xóa người dùng thành công";
+                return RedirectToAction("Index","User");
+            }
+
+            ModelState.AddModelError("", result.Errors.Description);
+            return View(ModelState);
         }
 
         [HttpGet]
@@ -95,13 +127,32 @@ namespace MyProject.Controllers
             if (!ModelState.IsValid)
                 return View();
             var result = await _userApi.RegisterUser(request);
-            if (result)
+            if (result.Successed)
             {
-                return RedirectToAction("Index","User");
+                TempData["result"] = "Thêm mới người dùng thành công";
+                return RedirectToAction("Login","User");
             }
-            return View(request);
+            ViewBag.SuccessMsg = result.Errors.Description;
+            return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateUser(Guid id, UpdateUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Index");
+            }
+            var result = await _userApi.UpdateUser(id, request);
+            if (result.Successed)
+            {
+                TempData["result"] = "Thêm mới người dùng thành công";
+                return RedirectToAction("Index", "User");
+            }
+            TempData["result"] = result.Errors.Description;
+            return RedirectToAction("Index", "User");
+
+        }
 
         private ClaimsPrincipal ValidateToken(string JwtToken)
         {

@@ -93,10 +93,10 @@ namespace MyProject.Application.System.User
             {
                 var failResponseEmail = new AuthenticateResponse()
                 {
-                    Successed = true,
+                    Successed = false,
                     Errors = new Error() { Code = "register_failed", Description = CommonMessage.EmailAlreadyExists }
                 };
-                return failResponse;
+                return failResponseEmail;
             }
             var user = new AppUser()
             {

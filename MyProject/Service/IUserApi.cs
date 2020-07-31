@@ -1,4 +1,5 @@
-﻿using MyProject.Application.ModelRequestService.ModelCommon;
+﻿using MyProject.Application;
+using MyProject.Application.ModelRequestService.ModelCommon;
 using MyProject.Application.ModelRequestService.ServiceRequest.User;
 using MyProject.Common;
 using System;
@@ -14,7 +15,9 @@ namespace MyProject.Service
 
         Task<Pagination<UserViewModel>> GetUserPaging(SearchingBase request);
 
-        Task<bool> RegisterUser(RegisterRequest request);
+        Task<ResponseBase> RegisterUser(RegisterRequest request);
+        Task<ResponseBase> Delete(Guid id);
+        Task<ResponseBase> UpdateUser(Guid id, UpdateUserRequest request);
 
     }
 }
