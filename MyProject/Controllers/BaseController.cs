@@ -16,7 +16,7 @@ namespace MyProject.Controllers
             var sessions = Request.Cookies["token"];
             if (sessions == null)
             {
-                context.Result = new RedirectToActionResult("Index", "Login", null);
+                context.Result = new RedirectToActionResult("Login", "User", null);
             }
             base.OnActionExecuting(context);
         }

@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using MyProject.Application.ModelRequestService.ServiceRequest.Product;
 using MyProject.Application;
 using MyProject.Application.ModelRequestService.PublicRequest;
+using System.Text;
+using System.IO;
 
 namespace MyProject.Service
 {
@@ -32,9 +34,40 @@ namespace MyProject.Service
             throw new NotImplementedException();
         }
 
-        public Task<ResponseBase> CreateProduct(ProductCreateRequest request)
+        public async Task<ResponseBase> CreateProduct(ProductCreateRequest request)
         {
-            throw new NotImplementedException();
+           
+            var client = _httpClientFactory.CreateClient();
+            var session = _httpContextAccessor.HttpContext.Request.Cookies["token"];
+
+            
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
+            var contentFile = new MultipartFormDataContent();
+
+            if (request.ImageProduct != null)
+            {
+                byte[] data;
+                using (var reader = new BinaryReader(request.ImageProduct.OpenReadStream()))
+                {
+                    data = reader.ReadBytes((int)request.ImageProduct.OpenReadStream().Length);
+
+                }
+                ByteArrayContent bytes = new ByteArrayContent(data);
+                contentFile.Add(bytes, "ImageProduct", request.ImageProduct.FileName);
+            }
+            contentFile.Add(new StringContent(request.Name), "Name");
+            contentFile.Add(new StringContent(request.BrandId.ToString()), "BrandId");
+            contentFile.Add(new StringContent(request.Description), "Description");
+            contentFile.Add(new StringContent(request.Details), "Details");
+            contentFile.Add(new StringContent(request.UserCreated), "UserCreated");
+            contentFile.Add(new StringContent(request.Status.ToString()), "Status");
+
+            var response = await client.PostAsync($"/api/product",contentFile);
+            var dataResult = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ResponseBase>(dataResult);
+
+            return result;
         }
 
         public Task<ResponseBase> CreateProductDetail(ProductDetailCreateRequest request)

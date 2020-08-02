@@ -16,7 +16,7 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest.Product
         public int Size { get; set; }
 
         public DateTime? DateModified { get; set; }
-        public int? UserModified { get; set; }
+        public string UserModified { get; set; }
         public bool Status { get; set; }
     }
 }

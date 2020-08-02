@@ -13,7 +13,7 @@ namespace MyProject.Application.ModelRequestService.ServiceRequest.Product
         public string Description { get; set; }
         public string Details { get; set; }
         
-        public int UserCreated { get; set; }
+        public string UserCreated { get; set; }
         
 
         public bool Status { get; set; }

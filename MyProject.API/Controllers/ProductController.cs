@@ -51,6 +51,7 @@ namespace MyProject.API.Controllers
             return Ok(result);
         }
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> PostAsync([FromForm] ProductCreateRequest request)
         {
             var result = await _service.CreateProduct(request);
@@ -58,13 +59,13 @@ namespace MyProject.API.Controllers
         }
 
         [HttpPost("details")]
-        public async Task<IActionResult> PostAsync([FromForm]ProductDetailCreateRequest request)
+        public async Task<IActionResult> PostAsync([FromBody]ProductDetailCreateRequest request)
         {
             var result = await _service.CreateProductDetail(request);
             return Ok(result);
         }
         [HttpPut]
-        public async Task<IActionResult> PutAsync([FromForm] ProductUpdateRequest request)
+        public async Task<IActionResult> PutAsync([FromBody] ProductUpdateRequest request)
         {
             var result = await _service.UpdateProduct(request);
             return Ok(result);

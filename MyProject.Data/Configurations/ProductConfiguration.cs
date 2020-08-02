@@ -22,7 +22,8 @@ namespace MyProject.Data.Configurations
             builder.Property(x => x.DateCreated).HasColumnType("datetime");
             builder.Property(x => x.DateModified).HasColumnType("datetime");
             builder.Property(x => x.DateModified).IsRequired(false);
-            builder.Property(x => x.UserModified).IsRequired(false);
+            builder.Property(x => x.UserCreated).HasMaxLength(100).IsUnicode(false);
+            builder.Property(x => x.UserModified).HasMaxLength(100).IsUnicode(false);
             builder.HasOne(p => p.Brand).WithMany(p => p.Products).HasForeignKey(p => p.BrandId);
             
 

@@ -383,14 +383,28 @@ namespace MyProject.Application.Service
 
         public async Task<Pagination<Product>> GetAllPaging(SearchingBase request)
         {
-            var product = _context.Products.OrderBy(p => p.Name);
+            var product = _context.Products.OrderBy(p => p.Name).Select(x=> new Product() 
+            { 
+                Id = x.Id,
+                Name = x.Name,
+                BrandId = x.BrandId,
+                Description = x.Description,
+                Details = x.Details,
+                Brand = new Brand()
+                {
+                    Id = x.Brand.Id,
+                    Name = x.Brand.Name
+                },
+                ProductImages = x.ProductImages.Where(x=>x.IsDefault == true).ToList()
+                
+            });
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 product = product.Where(x => x.Name.Contains(request.Keyword) || x.Description.Contains(request.Keyword) ).OrderBy(x=>x.Name);
             }
             var totalRow = await product.CountAsync();
             var data = await product.Skip((request.PageIndex - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
-
+            
             var result = new Pagination<Product>()
             {
                 CurrentPage = request.PageIndex,
